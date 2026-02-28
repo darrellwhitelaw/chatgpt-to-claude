@@ -3,6 +3,8 @@ interface SummaryCardProps {
   earliestYear: number;
   latestYear: number;
   onContinue: () => void;
+  hasApiKey?: boolean;
+  onChangeKey?: () => void;
 }
 
 export function SummaryCard({
@@ -10,6 +12,8 @@ export function SummaryCard({
   earliestYear,
   latestYear,
   onContinue,
+  hasApiKey,
+  onChangeKey,
 }: SummaryCardProps) {
   const yearRange =
     earliestYear === latestYear
@@ -33,6 +37,16 @@ export function SummaryCard({
       >
         Continue
       </button>
+
+      {/* Subtle "Change key" link — only visible when a key is already stored */}
+      {hasApiKey && onChangeKey && (
+        <button
+          onClick={onChangeKey}
+          className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors underline underline-offset-2"
+        >
+          Change key
+        </button>
+      )}
     </div>
   );
 }
