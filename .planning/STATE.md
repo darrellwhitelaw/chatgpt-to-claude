@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 1 of 5 (ZIP Parsing Foundation)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-28 — Plan 01-02 complete (streaming ZIP/JSON pipeline, normalizer, SQLite insert)
+Last activity: 2026-02-28 — Plan 01-03 complete (TDD linearize_messages tree traversal, normalizer wired)
 
-Progress: [██░░░░░░░░] 10%
+Progress: [███░░░░░░░] 15%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 10.5 min
-- Total execution time: 21 min
+- Total plans completed: 3
+- Average duration: 8 min
+- Total execution time: 24 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-zip-parsing-foundation | 2/4 | 21 min | 10.5 min |
+| 01-zip-parsing-foundation | 3/4 | 24 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 9m, 12m
+- Last 5 plans: 9m, 12m, 3m
 - Trend: stable
 
 *Updated after each plan completion*
@@ -52,6 +52,9 @@ Recent decisions affecting current work:
 - [01-02]: Vec<u8>/Cursor for ZIP entry — ZipFile borrow-lifetime issue resolved by reading bytes then wrapping in BufReader<Cursor>
 - [01-02]: into_iter() not StreamDeserializer — conversations.json is a single top-level array; StreamDeserializer is for NDJSON
 - [01-02]: traversal module commented out in mod.rs — plan 01-03 adds it; prevents compile error before that plan runs
+- [01-03]: Integration tests use tauri_app_lib crate name (not chatgpt_to_claude_lib) — lib name in Cargo.toml is tauri_app_lib; pipeline made pub in lib.rs for test access
+- [01-03]: Leaf-to-root collection then Vec::reverse() — walks parent chain naturally collecting leaf-first, single reverse gives O(n) chronological order
+- [01-03]: mapping.values() fully removed from normalizer — linearize_messages is now the authoritative message source for message_count and full_text
 
 ### Pending Todos
 
@@ -66,5 +69,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 01-02-PLAN.md — streaming ZIP/JSON pipeline, normalizer, SQLite insert, full parse_zip command
+Stopped at: Completed 01-03-PLAN.md — TDD linearize_messages tree traversal, normalizer updated to use traversal
 Resume file: None
