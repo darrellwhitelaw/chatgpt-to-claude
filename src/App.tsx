@@ -1,14 +1,36 @@
+import { useEffect } from 'react';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { useAppStore } from './store/appStore';
 import { useKeychain } from './hooks/useKeychain';
+import { useCluster } from './hooks/useCluster';
 import { DropZone } from './components/DropZone';
 import { ProgressView } from './components/ProgressView';
 import { SummaryCard } from './components/SummaryCard';
 import { ApiKeyScreen } from './screens/ApiKeyScreen';
+import { CostScreen } from './screens/CostScreen';
 
 export default function App() {
-  const { phase, stage, error, summary, reset, setAwaitingKey, setKeyStored, clusterError } = useAppStore();
+  const {
+    phase,
+    stage,
+    error,
+    summary,
+    reset,
+    setAwaitingKey,
+    setKeyStored,
+    clusterError,
+    tokenEstimate,
+    costEstimateUsd,
+  } = useAppStore();
   const { getApiKey } = useKeychain();
+  const { fetchCostEstimate } = useCluster();
+
+  // Auto-trigger cost estimation when phase transitions to key-stored
+  useEffect(() => {
+    if (phase === 'key-stored') {
+      fetchCostEstimate();
+    }
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSummaryContinue = async () => {
     try {
@@ -39,12 +61,10 @@ export default function App() {
         <ApiKeyScreen initialError={clusterError ?? undefined} />
       )}
       {phase === 'key-stored' && (
-        // CostScreen renders here — Plan 02-04 adds this
         <ProgressView stage="Counting tokens..." />
       )}
-      {phase === 'cost-ready' && (
-        // CostScreen renders here — Plan 02-04 replaces this placeholder
-        <ProgressView stage="Ready to cluster" />
+      {phase === 'cost-ready' && tokenEstimate !== null && costEstimateUsd !== null && (
+        <CostScreen tokens={tokenEstimate} estimatedUsd={costEstimateUsd} />
       )}
       {phase === 'clustering' && (
         // ClusteringView renders here — Plan 02-05 replaces this placeholder
