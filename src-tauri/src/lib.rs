@@ -14,11 +14,13 @@ pub struct AppState {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let db_path = app
+            let db_dir = app
                 .path()
                 .app_data_dir()
-                .expect("failed to get app data dir")
-                .join("conversations.db");
+                .expect("failed to get app data dir");
+            std::fs::create_dir_all(&db_dir)
+                .expect("failed to create app data dir");
+            let db_path = db_dir.join("conversations.db");
             let conn = Connection::open(&db_path)
                 .expect("failed to open database");
             store::db::init_schema(&conn)
