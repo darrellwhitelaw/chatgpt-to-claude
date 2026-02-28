@@ -55,14 +55,17 @@ pub struct Content {
     pub parts: Vec<serde_json::Value>,
 }
 
-/// Streams `ConversationExport` elements from a reader containing a top-level JSON array.
+/// Deserializes all `ConversationExport` elements from a reader containing a top-level
+/// JSON array (the format OpenAI uses in conversations.json).
 ///
-/// CRITICAL: This uses `Deserializer::from_reader().into_iter()` — NOT `StreamDeserializer`.
-/// `StreamDeserializer` handles multiple top-level values (NDJSON).
-/// `into_iter()` handles a single top-level array, yielding one element at a time through
-/// serde's sequence visitor — this is the correct pattern for conversations.json.
+/// Note: `serde_json::Deserializer::into_iter()` is a StreamDeserializer for NDJSON
+/// (multiple separate top-level values). It does NOT iterate array elements — it tries
+/// to deserialize the whole `[...]` as one `ConversationExport`, fails, and returns 0.
+/// The correct approach for a single top-level array is `from_reader::<Vec<T>>`.
+/// conversations.json bytes are already in-memory (Vec<u8> from zip_reader), so there
+/// is no additional memory cost from collecting into Vec<ConversationExport>.
 pub fn stream_conversations<R: Read>(
     reader: R,
-) -> impl Iterator<Item = Result<ConversationExport, serde_json::Error>> {
-    serde_json::Deserializer::from_reader(reader).into_iter::<ConversationExport>()
+) -> Result<Vec<ConversationExport>, serde_json::Error> {
+    serde_json::from_reader(reader)
 }

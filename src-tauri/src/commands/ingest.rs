@@ -14,7 +14,9 @@ pub enum IngestEvent {
     BuildingIndex,
     Complete {
         total: u32,
+        #[serde(rename = "earliestYear")]
         earliest_year: i32,
+        #[serde(rename = "latestYear")]
         latest_year: i32,
     },
     Error {
@@ -57,15 +59,10 @@ pub async fn parse_zip(
     let mut earliest_year: i32 = i32::MAX;
     let mut latest_year: i32 = i32::MIN;
 
-    for result in json_parser::stream_conversations(reader) {
-        let export = match result {
-            Ok(e) => e,
-            Err(err) => {
-                // Log and skip malformed entries — do not crash (IMP-05)
-                eprintln!("Skipping malformed conversation: {err}");
-                continue;
-            }
-        };
+    let conversations = json_parser::stream_conversations(reader)
+        .map_err(|e| format!("Failed to parse conversations.json: {e}"))?;
+
+    for export in conversations {
 
         // Track year range from create_time (Unix timestamp)
         if let Some(ts) = export.create_time {
