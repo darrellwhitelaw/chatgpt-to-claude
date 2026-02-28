@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ChatGPT to Claude",
+  "version": "0.1.0",
+  "identifier": "com.darrellwhitelaw.chatgpt-to-claude",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "ChatGPT to Claude",
+        "width": 600,
+        "height": 528,
+        "resizable": false,
+        "center": true,
+        "minWidth": 600,
+        "maxWidth": 600,
+        "minHeight": 528,
+        "maxHeight": 528
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
