@@ -12,7 +12,7 @@ Five sequential phases, each delivering a coherent capability that unblocks the 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: ZIP Parsing Foundation** - User drops a ChatGPT export ZIP and the app streams, parses, and stores all conversations in SQLite
+- [x] **Phase 1: ZIP Parsing Foundation** - User drops a ChatGPT export ZIP and the app streams, parses, and stores all conversations in SQLite
 - [ ] **Phase 2: API Key + AI Clustering** - User enters their API key and the app clusters all conversations into named project groups via Claude Batch API
 - [ ] **Phase 3: Preview + Manifest Editing** - User reviews the proposed project structure and confirms before any files are written
 - [ ] **Phase 4: Output Folder Generation** - App writes the full per-project Markdown output folder the user drags into Claude.ai Projects
@@ -36,7 +36,7 @@ Plans:
 - [x] 01-01-PLAN.md — Tauri scaffold: workspace, Rust backend, React 19 frontend, SQLite init, IPC bridge stub
 - [x] 01-02-PLAN.md — ZIP streaming + conversations.json stream parsing (Rust, writes to SQLite)
 - [x] 01-03-PLAN.md — Conversation node-graph traversal TDD (current_node → parent chain, branched fixture)
-- [~] 01-04-PLAN.md — Drag-and-drop + file picker UI with progress stages and summary card (Tasks 1+2 done, awaiting human-verify)
+- [x] 01-04-PLAN.md — Drag-and-drop + file picker UI with progress stages and summary card (human-verified: 1,032 conversations from 704MB export)
 
 ### Phase 2: API Key + AI Clustering
 **Goal**: User can enter their Anthropic API key (stored in macOS Keychain) and trigger AI clustering of all parsed conversations — with a cost estimate shown before submission and cluster assignments written to SQLite on completion
@@ -116,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. ZIP Parsing Foundation | 3/4 (04 in-progress) | Awaiting checkpoint | - |
+| 1. ZIP Parsing Foundation | 4/4 | Complete | 2026-02-28 |
 | 2. API Key + AI Clustering | 0/5 | Not started | - |
 | 3. Preview + Manifest Editing | 0/2 | Not started | - |
 | 4. Output Folder Generation | 0/6 | Not started | - |

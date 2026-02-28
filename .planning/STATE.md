@@ -9,28 +9,28 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 
 ## Current Position
 
-Phase: 1 of 5 (ZIP Parsing Foundation)
-Plan: 4 of 4 in current phase (paused at Task 3 — checkpoint:human-verify)
-Status: Awaiting human verification
-Last activity: 2026-02-28 — Plan 01-04 Tasks 1+2 complete (Zustand store, useIngest hook, App state machine, DropZone, ProgressView, SummaryCard)
+Phase: 1 of 5 (ZIP Parsing Foundation) — COMPLETE
+Plan: 4 of 4 in current phase (all plans complete)
+Status: Phase 1 complete — ready for Phase 2
+Last activity: 2026-02-28 — Plan 01-04 all tasks complete; human-verified with 704MB real export (1,032 conversations, 2023–2026)
 
-Progress: [████░░░░░░] 18%
+Progress: [██████████] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 8 min
-- Total execution time: 24 min
+- Total plans completed: 4
+- Average duration: ~13 min
+- Total execution time: ~54 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-zip-parsing-foundation | 3/4 | 24 min | 8 min |
+| 01-zip-parsing-foundation | 4/4 | ~54 min | ~13 min |
 
 **Recent Trend:**
-- Last 5 plans: 9m, 12m, 3m
+- Last 5 plans: 9m, 12m, 3m, ~30m
 - Trend: stable
 
 *Updated after each plan completion*
@@ -58,6 +58,8 @@ Recent decisions affecting current work:
 - [01-04]: Tauri onDragDropEvent used for drag-and-drop (not HTML5 onDrop) — HTML5 gives no filesystem paths in Tauri webview
 - [01-04]: Component stubs created in Task 1 to allow tsc verification — App.tsx imports require all three component files to exist before typecheck passes
 - [01-04]: Browse link uses @tauri-apps/plugin-dialog open() with zip extension filter — native macOS file picker
+- [01-04]: SQLite Connection::open requires parent directory to exist — create_dir_all before DB init required on first launch (fixed post-verify)
+- [01-04]: conversations.json parsed as full array (from_str::<Vec<_>>) not StreamDeserializer; year range as plain integers — fixed post-verify after real 704MB export exposed mismatch
 
 ### Pending Todos
 
@@ -72,5 +74,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Plan 01-04 Task 3 — awaiting human-verify checkpoint (pnpm tauri dev visual verification)
+Stopped at: Phase 1 complete — Plan 01-04 fully verified (1,032 conversations from 704MB export). Ready for Phase 2.
 Resume file: None
