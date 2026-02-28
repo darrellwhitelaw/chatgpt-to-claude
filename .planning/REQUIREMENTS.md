@@ -16,13 +16,13 @@
 
 ### Security
 
-- [ ] **SEC-01**: User can enter their Anthropic API key in the app; key is stored in macOS Keychain (never written to disk or hardcoded)
-- [ ] **SEC-02**: App displays the API key entry UI on first launch if no key is stored
+- [x] **SEC-01**: User can enter their Anthropic API key in the app; key is stored in macOS Keychain (never written to disk or hardcoded)
+- [x] **SEC-02**: App displays the API key entry UI on first launch if no key is stored
 
 ### AI Processing
 
-- [ ] **AI-01**: App uses the Anthropic Message Batches API to cluster conversations by topic into named project groups
-- [ ] **AI-02**: App shows an estimated API cost (tokens + approximate $) to the user before the clustering batch is submitted
+- [x] **AI-01**: App uses the Anthropic Message Batches API to cluster conversations by topic into named project groups
+- [x] **AI-02**: App shows an estimated API cost (tokens + approximate $) to the user before the clustering batch is submitted
 - [ ] **AI-03**: App generates an AI summary for each conversation (key decisions, conclusions, context)
 - [ ] **AI-04**: App extracts custom instructions and system prompts from ChatGPT conversations into a separate file per project
 
@@ -96,10 +96,10 @@
 | IMP-04 | Phase 1 | Complete (01-02) |
 | IMP-05 | Phase 1 | Complete (01-02) |
 | IMP-06 | Phase 1 | Complete |
-| SEC-01 | Phase 2 | Pending |
-| SEC-02 | Phase 2 | Pending |
-| AI-01 | Phase 2 | Pending |
-| AI-02 | Phase 2 | Pending |
+| SEC-01 | Phase 2 | Complete |
+| SEC-02 | Phase 2 | Complete |
+| AI-01 | Phase 2 | Complete |
+| AI-02 | Phase 2 | Complete |
 | AI-03 | Phase 2 | Pending |
 | AI-04 | Phase 2 | Pending |
 | PREV-01 | Phase 3 | Pending |

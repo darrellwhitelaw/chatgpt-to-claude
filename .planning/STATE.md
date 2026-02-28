@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (API Key + AI Clustering) — IN PROGRESS
-Plan: 3 of 8 complete (Plan 02-03 done)
-Status: Phase 2 underway — API key entry UI complete, App.tsx fully routed
-Last activity: 2026-02-28 — Plan 02-03 complete; useKeychain hook, ApiKeyScreen, SummaryCard change-key link, App.tsx Phase 2 routing
+Plan: 4 of 8 complete (Plan 02-04 done)
+Status: Phase 2 underway — cost estimation screen complete with token count + USD display
+Last activity: 2026-02-28 — Plan 02-04 complete; estimate_cost command, CostScreen, useCluster hook, App.tsx cost-ready routing
 
-Progress: [█████████████] 26%
+Progress: [██████████████] 29%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: ~12 min
-- Total execution time: ~56 min
+- Total plans completed: 7
+- Average duration: ~11 min
+- Total execution time: ~63 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-zip-parsing-foundation | 4/4 | ~54 min | ~13 min |
-| 02-api-key-ai-clustering | 3/8 | ~5 min | ~2 min |
+| 02-api-key-ai-clustering | 4/8 | ~12 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 9m, 12m, 3m, ~30m, 2m
+- Last 5 plans: 12m, 3m, ~30m, 2m, 7m
 - Trend: stable
 
 *Updated after each plan completion*
@@ -71,6 +71,9 @@ Recent decisions affecting current work:
 - [02-03]: ApiKeyScreen takes initialError prop — CostScreen (02-04) transitions back to awaiting-key with clusterError, passed as initialError
 - [02-03]: Keychain validation deferred to CostScreen — set_api_key is idempotent; bad keys surface at cost-estimation time, not entry time
 - [02-03]: handleSummaryContinue catches getApiKey rejection to distinguish first-launch from returning user without extra state field
+- [02-04]: useCluster bad-key path uses useAppStore.setState atomically (clusterError + phase) to avoid intermediate 'error' phase flash from setClusterError action
+- [02-04]: CostScreen Proceed uses setClustering('pending') placeholder batchId — replaced in Plan 02-05 with real batch invocation
+- [02-04]: Cancel returns to 'complete' phase via direct setState — Zustand allows direct setState outside of actions
 
 ### Pending Todos
 
@@ -85,5 +88,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-api-key-ai-clustering/02-03-PLAN.md — useKeychain hook, ApiKeyScreen, SummaryCard change-key, App.tsx Phase 2 routing. Ready for Plan 02-04.
+Stopped at: Completed 02-api-key-ai-clustering/02-04-PLAN.md — estimate_cost Tauri command, CostScreen with token + USD display, useCluster hook, App.tsx cost-ready routing. Ready for Plan 02-05.
 Resume file: None
