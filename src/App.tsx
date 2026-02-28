@@ -19,6 +19,7 @@ export default function App() {
     reset,
     setAwaitingKey,
     setKeyStored,
+    setExportWithoutAI,
     clusterError,
     tokenEstimate,
     costEstimateUsd,
@@ -70,7 +71,8 @@ export default function App() {
           total={summary.total}
           earliestYear={summary.earliestYear}
           latestYear={summary.latestYear}
-          onContinue={handleSummaryContinue}
+          onContinueWithAI={handleSummaryContinue}
+          onExportWithoutAI={setExportWithoutAI}
           hasApiKey={false}
           onChangeKey={() => setAwaitingKey()}
         />
@@ -92,9 +94,9 @@ export default function App() {
       {phase === 'clustering' && (
         <ClusteringView stage={stage} elapsedSecs={elapsedSecs} />
       )}
-      {phase === 'clustering-complete' && (
-        // Phase 3 entry point — placeholder
-        <ProgressView stage="Clustering complete" />
+      {phase === 'preview-ready' && (
+        // Phase 3 entry point — reached via either with-ai or without-ai path
+        <ProgressView stage="Preparing preview…" />
       )}
 
       {/* Footer */}

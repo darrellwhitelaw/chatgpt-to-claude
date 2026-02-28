@@ -8,8 +8,11 @@ export type AppPhase =
   | 'key-stored'           // Phase 2: key confirmed valid — ready to fetch cost
   | 'cost-ready'           // Phase 2: token count returned — show CostScreen with Proceed/Cancel
   | 'clustering'           // Phase 2: batch submitted, polling active — show ClusteringView
-  | 'clustering-complete'  // Phase 2: batch done, SQLite written — ready for Phase 3
+  | 'clustering-complete'  // Phase 2 (with-ai): batch done, SQLite written — entering Phase 3
+  | 'preview-ready'        // Phase 3 entry: reached via either with-ai or without-ai path
   | 'error';
+
+export type ExportMode = 'with-ai' | 'without-ai' | null;
 
 export interface Summary {
   total: number;
@@ -22,13 +25,14 @@ interface AppState {
   stage: string;               // Human-readable current stage label
   error: string | null;
   summary: Summary | null;
+  exportMode: ExportMode;      // which path user chose on summary card
 
   // Phase 2 fields
   tokenEstimate: number | null;      // exact count from /v1/messages/count_tokens
   costEstimateUsd: number | null;    // computed cost in USD
   batchId: string | null;            // Anthropic batch ID from submission
   clusterError: string | null;       // error message for clustering failure screen
-  elapsedSecs: number;               // seconds elapsed during batch polling — set by useCluster on polling events
+  elapsedSecs: number;               // seconds elapsed during batch polling
 
   // Phase 1 actions
   setStage: (stage: string) => void;
@@ -43,6 +47,9 @@ interface AppState {
   setClustering: (batchId: string) => void;
   setClusteringComplete: () => void;
   setClusterError: (msg: string) => void;
+
+  // No-AI path
+  setExportWithoutAI: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -50,6 +57,7 @@ export const useAppStore = create<AppState>((set) => ({
   stage: '',
   error: null,
   summary: null,
+  exportMode: null,
 
   // Phase 2 initial state
   tokenEstimate: null,
@@ -63,16 +71,19 @@ export const useAppStore = create<AppState>((set) => ({
   setError: (msg) => set({ phase: 'error', error: msg }),
   setComplete: (summary) => set({ phase: 'complete', summary }),
   reset: () => set({
-    phase: 'idle', stage: '', error: null, summary: null,
+    phase: 'idle', stage: '', error: null, summary: null, exportMode: null,
     tokenEstimate: null, costEstimateUsd: null, batchId: null, clusterError: null, elapsedSecs: 0,
   }),
 
   // Phase 2 actions
-  setAwaitingKey: () => set({ phase: 'awaiting-key' }),
+  setAwaitingKey: () => set({ phase: 'awaiting-key', exportMode: 'with-ai' }),
   setKeyStored: () => set({ phase: 'key-stored' }),
   setCostReady: (tokenEstimate, costEstimateUsd) =>
     set({ phase: 'cost-ready', tokenEstimate, costEstimateUsd }),
   setClustering: (batchId) => set({ phase: 'clustering', batchId }),
-  setClusteringComplete: () => set({ phase: 'clustering-complete' }),
+  setClusteringComplete: () => set({ phase: 'preview-ready' }),
   setClusterError: (msg) => set({ phase: 'error', clusterError: msg }),
+
+  // No-AI path — skip all of Phase 2, go straight to Phase 3 preview
+  setExportWithoutAI: () => set({ phase: 'preview-ready', exportMode: 'without-ai' }),
 }));
