@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (API Key + AI Clustering) — IN PROGRESS
-Plan: 2 of 8 complete (Plan 02-02 done)
-Status: Phase 2 underway — TypeScript type layer complete
-Last activity: 2026-02-28 — Plan 02-02 complete; AppPhase extended to 8 variants, ClusterEvent IPC bindings added
+Plan: 3 of 8 complete (Plan 02-03 done)
+Status: Phase 2 underway — API key entry UI complete, App.tsx fully routed
+Last activity: 2026-02-28 — Plan 02-03 complete; useKeychain hook, ApiKeyScreen, SummaryCard change-key link, App.tsx Phase 2 routing
 
-Progress: [████████████] 24%
+Progress: [█████████████] 26%
 
 ## Performance Metrics
 
@@ -28,7 +28,7 @@ Progress: [████████████] 24%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-zip-parsing-foundation | 4/4 | ~54 min | ~13 min |
-| 02-api-key-ai-clustering | 2/8 | ~4 min | ~2 min |
+| 02-api-key-ai-clustering | 3/8 | ~5 min | ~2 min |
 
 **Recent Trend:**
 - Last 5 plans: 9m, 12m, 3m, ~30m, 2m
@@ -68,6 +68,9 @@ Recent decisions affecting current work:
 - [02-02]: AppPhase is a flat string union — simple to switch on, no nested objects, consistent with Phase 1 pattern
 - [02-02]: ClusterEvent uses event discriminant key to match IngestEvent convention already in bindings.ts
 - [02-02]: setClusterError routes to 'error' phase (not a new 'clustering-error') — single error phase covers both Phase 1 and Phase 2 error UI
+- [02-03]: ApiKeyScreen takes initialError prop — CostScreen (02-04) transitions back to awaiting-key with clusterError, passed as initialError
+- [02-03]: Keychain validation deferred to CostScreen — set_api_key is idempotent; bad keys surface at cost-estimation time, not entry time
+- [02-03]: handleSummaryContinue catches getApiKey rejection to distinguish first-launch from returning user without extra state field
 
 ### Pending Todos
 
@@ -82,5 +85,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-api-key-ai-clustering/02-02-PLAN.md — AppPhase extension + ClusterEvent IPC bindings. Ready for Plan 02-03.
+Stopped at: Completed 02-api-key-ai-clustering/02-03-PLAN.md — useKeychain hook, ApiKeyScreen, SummaryCard change-key, App.tsx Phase 2 routing. Ready for Plan 02-04.
 Resume file: None
