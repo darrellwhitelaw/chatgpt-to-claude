@@ -1,1 +1,4 @@
-// Pipeline modules added in plans 01-02 and 01-03
+pub mod json_parser;
+pub mod normalizer;
+// pub mod traversal; // added by plan 01-03
+pub mod zip_reader;
