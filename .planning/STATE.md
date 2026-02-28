@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 1 of 5 (ZIP Parsing Foundation)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-28 — Plan 01-03 complete (TDD linearize_messages tree traversal, normalizer wired)
+Plan: 4 of 4 in current phase (paused at Task 3 — checkpoint:human-verify)
+Status: Awaiting human verification
+Last activity: 2026-02-28 — Plan 01-04 Tasks 1+2 complete (Zustand store, useIngest hook, App state machine, DropZone, ProgressView, SummaryCard)
 
-Progress: [███░░░░░░░] 15%
+Progress: [████░░░░░░] 18%
 
 ## Performance Metrics
 
@@ -55,6 +55,9 @@ Recent decisions affecting current work:
 - [01-03]: Integration tests use tauri_app_lib crate name (not chatgpt_to_claude_lib) — lib name in Cargo.toml is tauri_app_lib; pipeline made pub in lib.rs for test access
 - [01-03]: Leaf-to-root collection then Vec::reverse() — walks parent chain naturally collecting leaf-first, single reverse gives O(n) chronological order
 - [01-03]: mapping.values() fully removed from normalizer — linearize_messages is now the authoritative message source for message_count and full_text
+- [01-04]: Tauri onDragDropEvent used for drag-and-drop (not HTML5 onDrop) — HTML5 gives no filesystem paths in Tauri webview
+- [01-04]: Component stubs created in Task 1 to allow tsc verification — App.tsx imports require all three component files to exist before typecheck passes
+- [01-04]: Browse link uses @tauri-apps/plugin-dialog open() with zip extension filter — native macOS file picker
 
 ### Pending Todos
 
@@ -69,5 +72,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 01-03-PLAN.md — TDD linearize_messages tree traversal, normalizer updated to use traversal
+Stopped at: Plan 01-04 Task 3 — awaiting human-verify checkpoint (pnpm tauri dev visual verification)
 Resume file: None

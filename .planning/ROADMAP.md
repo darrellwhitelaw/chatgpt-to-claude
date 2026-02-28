@@ -36,7 +36,7 @@ Plans:
 - [x] 01-01-PLAN.md — Tauri scaffold: workspace, Rust backend, React 19 frontend, SQLite init, IPC bridge stub
 - [x] 01-02-PLAN.md — ZIP streaming + conversations.json stream parsing (Rust, writes to SQLite)
 - [x] 01-03-PLAN.md — Conversation node-graph traversal TDD (current_node → parent chain, branched fixture)
-- [ ] 01-04-PLAN.md — Drag-and-drop + file picker UI with progress stages and summary card
+- [~] 01-04-PLAN.md — Drag-and-drop + file picker UI with progress stages and summary card (Tasks 1+2 done, awaiting human-verify)
 
 ### Phase 2: API Key + AI Clustering
 **Goal**: User can enter their Anthropic API key (stored in macOS Keychain) and trigger AI clustering of all parsed conversations — with a cost estimate shown before submission and cluster assignments written to SQLite on completion
@@ -116,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. ZIP Parsing Foundation | 3/4 | In progress | - |
+| 1. ZIP Parsing Foundation | 3/4 (04 in-progress) | Awaiting checkpoint | - |
 | 2. API Key + AI Clustering | 0/5 | Not started | - |
 | 3. Preview + Manifest Editing | 0/2 | Not started | - |
 | 4. Output Folder Generation | 0/6 | Not started | - |
