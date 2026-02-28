@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 1 of 5 (ZIP Parsing Foundation)
-Plan: 0 of 4 in current phase
-Status: Ready to plan
-Last activity: 2026-02-28 — Roadmap created; research completed; requirements defined (26 v1)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-28 — Plan 01-01 complete (scaffold, SQLite schema, parse_zip stub)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 1
+- Average duration: 9 min
+- Total execution time: 9 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-zip-parsing-foundation | 1/4 | 9 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 9m
+- Trend: baseline
 
 *Updated after each plan completion*
 
@@ -46,10 +46,13 @@ Recent decisions affecting current work:
 - [Research]: Output strategy confirmed — local folder of Markdown files (not browser automation); no public Claude.ai Projects API exists
 - [Research]: Batch API mandatory for clustering — sequential API calls hit Tier 1 rate limits at scale (3,000 conversations = 60+ min sequential)
 - [Research]: conversations.json is a tree (not flat list) — current_node → parent traversal required; linear flattening produces silently wrong output
+- [01-01]: Window height 528px outer (not 500px) — macOS title bar consumes ~28px; gives 500px usable content area
+- [01-01]: rusqlite bundled feature — embeds SQLite so no system library dependency; required for portable DMG distribution
+- [01-01]: parse_zip stub uses _path prefix — suppresses unused variable warning while keeping full IPC signature for plan 01-02
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
@@ -60,5 +63,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Roadmap created and written to disk; ready to begin planning Phase 1
+Stopped at: Completed 01-01-PLAN.md — scaffold + SQLite schema + parse_zip stub, all clean
 Resume file: None

@@ -9,8 +9,8 @@
 
 - [ ] **IMP-01**: User can drag-and-drop a ChatGPT export ZIP onto the app window to begin migration
 - [ ] **IMP-02**: User can use a file picker button as an alternative to drag-and-drop
-- [ ] **IMP-03**: App displays a progress bar with status text during ZIP extraction and JSON streaming
-- [ ] **IMP-04**: App streams and parses conversations.json without loading the entire file into memory (handles GB-scale exports)
+- [x] **IMP-03**: App displays a progress bar with status text during ZIP extraction and JSON streaming
+- [x] **IMP-04**: App streams and parses conversations.json without loading the entire file into memory (handles GB-scale exports)
 - [ ] **IMP-05**: App handles null, missing, or unexpected fields in conversations.json gracefully (schema is undocumented and changes without notice)
 - [ ] **IMP-06**: App correctly reconstructs conversation message order by traversing the node-graph structure (walking parent references from current_node)
 
@@ -92,8 +92,8 @@
 |-------------|-------|--------|
 | IMP-01 | Phase 1 | Pending |
 | IMP-02 | Phase 1 | Pending |
-| IMP-03 | Phase 1 | Pending |
-| IMP-04 | Phase 1 | Pending |
+| IMP-03 | Phase 1 | Complete (01-01) |
+| IMP-04 | Phase 1 | Complete (01-01) |
 | IMP-05 | Phase 1 | Pending |
 | IMP-06 | Phase 1 | Pending |
 | SEC-01 | Phase 2 | Pending |
