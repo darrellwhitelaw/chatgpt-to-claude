@@ -35,6 +35,7 @@ pub fn run() {
             commands::keychain::get_api_key,
             commands::keychain::set_api_key,
             commands::keychain::delete_api_key,
+            commands::cluster::estimate_cost,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
