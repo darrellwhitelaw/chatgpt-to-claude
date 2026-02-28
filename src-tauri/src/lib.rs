@@ -1,3 +1,4 @@
+mod ai;
 mod commands;
 pub mod pipeline;
 mod store;
@@ -36,6 +37,7 @@ pub fn run() {
             commands::keychain::set_api_key,
             commands::keychain::delete_api_key,
             commands::cluster::estimate_cost,
+            commands::cluster::start_clustering,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
