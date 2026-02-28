@@ -2,7 +2,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub const MODEL: &str = "claude-haiku-3-5-20241022";
+pub const MODEL: &str = "claude-3-5-haiku-20241022";
 pub const ANTHROPIC_VERSION: &str = "2023-06-01";
 pub const BATCH_API_URL: &str = "https://api.anthropic.com/v1/messages/batches";
 pub const MESSAGES_API_URL: &str = "https://api.anthropic.com/v1/messages";

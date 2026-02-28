@@ -3,13 +3,13 @@ import { create } from 'zustand';
 export type AppPhase =
   | 'idle'
   | 'parsing'
-  | 'complete'             // Phase 1: summary card shown
-  | 'awaiting-key'         // Phase 2: no API key in Keychain — show ApiKeyScreen
-  | 'key-stored'           // Phase 2: key confirmed valid — ready to fetch cost
-  | 'cost-ready'           // Phase 2: token count returned — show CostScreen with Proceed/Cancel
-  | 'clustering'           // Phase 2: batch submitted, polling active — show ClusteringView
-  | 'clustering-complete'  // Phase 2 (with-ai): batch done, SQLite written — entering Phase 3
-  | 'preview-ready'        // Phase 3 entry: reached via either with-ai or without-ai path
+  | 'complete'             // Summary card shown
+  | 'exporting'            // Writing markdown files to disk
+  | 'export-success'       // Export complete — show success screen
+  | 'awaiting-key'         // AI path: no API key — show ApiKeyScreen
+  | 'key-stored'           // AI path: key confirmed — ready to fetch cost
+  | 'cost-ready'           // AI path: show CostScreen
+  | 'clustering'           // AI path: batch polling active
   | 'error';
 
 export type ExportMode = 'with-ai' | 'without-ai' | null;
@@ -22,17 +22,21 @@ export interface Summary {
 
 interface AppState {
   phase: AppPhase;
-  stage: string;               // Human-readable current stage label
+  stage: string;
   error: string | null;
   summary: Summary | null;
-  exportMode: ExportMode;      // which path user chose on summary card
+  exportMode: ExportMode;
+  exportPath: string | null;        // path written to on export-success
+  exportCount: number | null;       // files written on export-success
+  mcpConfigured: boolean | null;    // whether Claude Desktop MCP was auto-configured
+  mediaExtracted: number | null;    // images + group chats extracted from ZIP
 
-  // Phase 2 fields
-  tokenEstimate: number | null;      // exact count from /v1/messages/count_tokens
-  costEstimateUsd: number | null;    // computed cost in USD
-  batchId: string | null;            // Anthropic batch ID from submission
-  clusterError: string | null;       // error message for clustering failure screen
-  elapsedSecs: number;               // seconds elapsed during batch polling
+  // AI path fields
+  tokenEstimate: number | null;
+  costEstimateUsd: number | null;
+  batchId: string | null;
+  clusterError: string | null;
+  elapsedSecs: number;
 
   // Phase 1 actions
   setStage: (stage: string) => void;
@@ -40,16 +44,17 @@ interface AppState {
   setComplete: (summary: Summary) => void;
   reset: () => void;
 
-  // Phase 2 actions
+  // Export path actions
+  setExporting: () => void;
+  setExportSuccess: (path: string, count: number, mcpConfigured: boolean, mediaExtracted: number) => void;
+
+  // AI path actions
   setAwaitingKey: () => void;
   setKeyStored: () => void;
   setCostReady: (tokenEstimate: number, costEstimateUsd: number) => void;
   setClustering: (batchId: string) => void;
   setClusteringComplete: () => void;
   setClusterError: (msg: string) => void;
-
-  // No-AI path
-  setExportWithoutAI: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -58,32 +63,39 @@ export const useAppStore = create<AppState>((set) => ({
   error: null,
   summary: null,
   exportMode: null,
+  exportPath: null,
+  exportCount: null,
+  mcpConfigured: null,
+  mediaExtracted: null,
 
-  // Phase 2 initial state
   tokenEstimate: null,
   costEstimateUsd: null,
   batchId: null,
   clusterError: null,
   elapsedSecs: 0,
 
-  // Phase 1 actions
+  // Phase 1
   setStage: (stage) => set({ phase: 'parsing', stage, error: null }),
   setError: (msg) => set({ phase: 'error', error: msg }),
   setComplete: (summary) => set({ phase: 'complete', summary }),
   reset: () => set({
-    phase: 'idle', stage: '', error: null, summary: null, exportMode: null,
-    tokenEstimate: null, costEstimateUsd: null, batchId: null, clusterError: null, elapsedSecs: 0,
+    phase: 'idle', stage: '', error: null, summary: null,
+    exportMode: null, exportPath: null, exportCount: null, mcpConfigured: null, mediaExtracted: null,
+    tokenEstimate: null, costEstimateUsd: null, batchId: null,
+    clusterError: null, elapsedSecs: 0,
   }),
 
-  // Phase 2 actions
+  // Export path
+  setExporting: () => set({ phase: 'exporting', exportMode: 'without-ai' }),
+  setExportSuccess: (path, count, mcpConfigured, mediaExtracted) =>
+    set({ phase: 'export-success', exportPath: path, exportCount: count, mcpConfigured, mediaExtracted }),
+
+  // AI path
   setAwaitingKey: () => set({ phase: 'awaiting-key', exportMode: 'with-ai' }),
   setKeyStored: () => set({ phase: 'key-stored' }),
   setCostReady: (tokenEstimate, costEstimateUsd) =>
     set({ phase: 'cost-ready', tokenEstimate, costEstimateUsd }),
   setClustering: (batchId) => set({ phase: 'clustering', batchId }),
-  setClusteringComplete: () => set({ phase: 'preview-ready' }),
+  setClusteringComplete: () => set({ phase: 'export-success', exportMode: 'with-ai' }),
   setClusterError: (msg) => set({ phase: 'error', clusterError: msg }),
-
-  // No-AI path — skip all of Phase 2, go straight to Phase 3 preview
-  setExportWithoutAI: () => set({ phase: 'preview-ready', exportMode: 'without-ai' }),
 }));

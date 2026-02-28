@@ -13,6 +13,8 @@ pub struct ConversationExport {
     #[serde(default)]
     pub mapping: HashMap<String, MessageNode>,
     pub current_node: Option<String>,
+    /// ChatGPT project ID when prefixed with "g-p-", otherwise a custom GPT ID.
+    pub gizmo_id: Option<String>,
 }
 
 /// A node in the conversation tree (each message is a node with parent/children links).

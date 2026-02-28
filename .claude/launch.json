@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "chatgpt-to-claude",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "tauri", "--", "dev"],
+      "port": 1420,
+      "cwd": "/Users/darrellwhitelaw/Claude/chatgpt-to-claude"
+    }
+  ]
+}

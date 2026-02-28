@@ -11,6 +11,7 @@ export function useCluster() {
   const {
     setCostReady,
     setClusteringComplete,
+    setClusterError,
   } = useAppStore();
 
   const fetchCostEstimate = async (): Promise<void> => {
@@ -27,7 +28,7 @@ export function useCluster() {
           phase: 'awaiting-key',
         });
       } else {
-        useAppStore.getState().setError(msg);
+        setClusterError(msg);
       }
     }
   };

@@ -12,6 +12,7 @@ interface DropZoneProps {
 export function DropZone({ errorMessage, onReset }: DropZoneProps) {
   const { startIngest } = useIngest();
   const [isDragging, setIsDragging] = useState(false);
+  const [isBrowseHovered, setIsBrowseHovered] = useState(false);
   const unlistenRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -63,31 +64,38 @@ export function DropZone({ errorMessage, onReset }: DropZoneProps) {
       <div
         className={[
           'w-full rounded-xl border-2 border-dashed transition-colors duration-150',
-          'flex flex-col items-center justify-center gap-3 py-12 px-6',
+          'flex flex-col items-center justify-center py-10 px-6',
           isDragging
             ? 'border-neutral-400 bg-neutral-50'
             : 'border-neutral-300 bg-white',
         ].join(' ')}
       >
-        {/* ChatGPT ZIP icon */}
+        {/* ChatGPT ZIP icon — stands alone above the text+action group */}
         <img
           src={openaiZipIcon}
           alt="ChatGPT export"
-          className={`w-16 h-16 object-contain transition-opacity duration-150 ${isDragging ? 'opacity-70' : 'opacity-100'}`}
+          className={`w-16 h-16 object-contain transition-opacity duration-150 mb-5 ${isDragging ? 'opacity-70' : 'opacity-100'}`}
         />
 
-        {/* Single instruction line — exact copy locked in CONTEXT.md */}
-        <p className="text-sm text-neutral-500 text-center leading-snug">
-          Drop your ChatGPT export here
-        </p>
+        {/* Text + action grouped tightly together */}
+        <div className="flex flex-col items-center gap-3">
+          <p className="text-sm text-neutral-500 text-center leading-snug">
+            Drop your ChatGPT export here
+          </p>
 
-        {/* Browse link — secondary affordance inside the zone */}
-        <button
-          onClick={handleBrowse}
-          className="text-xs text-neutral-400 underline underline-offset-2 hover:text-neutral-600 transition-colors"
-        >
-          or browse for file
-        </button>
+          <button
+            onClick={handleBrowse}
+            onMouseEnter={() => setIsBrowseHovered(true)}
+            onMouseLeave={() => setIsBrowseHovered(false)}
+            className={`text-xs transition-colors px-4 py-1.5 rounded-full ${
+              isBrowseHovered
+                ? 'bg-neutral-900 text-white'
+                : 'bg-neutral-100 text-neutral-500'
+            }`}
+          >
+            or select file
+          </button>
+        </div>
       </div>
 
       {/* Inline error — shown adjacent to zone; zone stays interactive (locked decision) */}

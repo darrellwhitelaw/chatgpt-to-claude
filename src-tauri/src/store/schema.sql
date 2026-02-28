@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS conversations (
     has_code INTEGER NOT NULL DEFAULT 0,
     token_estimate INTEGER NOT NULL DEFAULT 0,
     full_text TEXT NOT NULL DEFAULT '',
+    gizmo_id TEXT,
     cluster_id TEXT,
     project_name TEXT,
     cluster_label TEXT,

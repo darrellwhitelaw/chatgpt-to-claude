@@ -11,6 +11,7 @@ pub struct ConversationRecord {
     pub has_code: bool,
     pub token_estimate: u32,
     pub full_text: String,
+    pub gizmo_id: Option<String>,
 }
 
 /// Normalizes a `ConversationExport` to a `ConversationRecord`.
@@ -65,6 +66,7 @@ pub fn normalize(export: ConversationExport) -> ConversationRecord {
         has_code,
         token_estimate,
         full_text,
+        gizmo_id: export.gizmo_id,
     }
 }
 

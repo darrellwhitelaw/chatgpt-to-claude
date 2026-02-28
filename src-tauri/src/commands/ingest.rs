@@ -110,5 +110,11 @@ pub async fn parse_zip(
         })
         .map_err(|e| e.to_string())?;
 
+    // Store ZIP path so export can extract media and other assets
+    {
+        let mut zp = state.zip_path.lock().map_err(|e| e.to_string())?;
+        *zp = Some(path);
+    }
+
     Ok(())
 }

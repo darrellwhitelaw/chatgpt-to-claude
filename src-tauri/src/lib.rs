@@ -9,6 +9,7 @@ use tauri::Manager;
 
 pub struct AppState {
     pub db: Mutex<Connection>,
+    pub zip_path: Mutex<Option<String>>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -26,7 +27,7 @@ pub fn run() {
                 .expect("failed to open database");
             store::db::init_schema(&conn)
                 .expect("failed to initialize schema");
-            app.manage(AppState { db: Mutex::new(conn) });
+            app.manage(AppState { db: Mutex::new(conn), zip_path: Mutex::new(None) });
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
@@ -38,6 +39,7 @@ pub fn run() {
             commands::keychain::delete_api_key,
             commands::cluster::estimate_cost,
             commands::cluster::start_clustering,
+            commands::export::export_conversations,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
