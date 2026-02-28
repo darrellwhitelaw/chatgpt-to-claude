@@ -30,13 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can watch a progress bar with status text while the ZIP is extracted and conversations.json is streamed and parsed
   4. App correctly displays a conversation count and date range after parsing completes — even for exports containing thousands of conversations and gigabytes of attachments
   5. App handles null fields, missing keys, and malformed conversation nodes gracefully without crashing or producing silently wrong output
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Tauri project scaffold — workspace, Rust backend, React frontend, IPC bridge
-- [ ] 01-02: ZIP streaming + conversations.json stream parsing (Rust, writes to SQLite)
-- [ ] 01-03: Conversation node-graph traversal (current_node → parent chain) with unit tests against branched fixture
-- [ ] 01-04: Drag-and-drop + file picker UI with progress bar and summary display
+- [ ] 01-01-PLAN.md — Tauri scaffold: workspace, Rust backend, React 19 frontend, SQLite init, IPC bridge stub
+- [ ] 01-02-PLAN.md — ZIP streaming + conversations.json stream parsing (Rust, writes to SQLite)
+- [ ] 01-03-PLAN.md — Conversation node-graph traversal TDD (current_node → parent chain, branched fixture)
+- [ ] 01-04-PLAN.md — Drag-and-drop + file picker UI with progress stages and summary card
 
 ### Phase 2: API Key + AI Clustering
 **Goal**: User can enter their Anthropic API key (stored in macOS Keychain) and trigger AI clustering of all parsed conversations — with a cost estimate shown before submission and cluster assignments written to SQLite on completion
@@ -116,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. ZIP Parsing Foundation | 0/4 | Not started | - |
+| 1. ZIP Parsing Foundation | 0/4 | Planned | - |
 | 2. API Key + AI Clustering | 0/5 | Not started | - |
 | 3. Preview + Manifest Editing | 0/2 | Not started | - |
 | 4. Output Folder Generation | 0/6 | Not started | - |
