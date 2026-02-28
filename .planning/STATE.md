@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** Drop in your ChatGPT export and end up with a well-organized Claude.ai Project folder structure that feels like your history was always there — not dumped in bulk.
-**Current focus:** Phase 1 — ZIP Parsing Foundation
+**Current focus:** Phase 2 — API Key + AI Clustering
 
 ## Current Position
 
-Phase: 1 of 5 (ZIP Parsing Foundation) — COMPLETE
-Plan: 4 of 4 in current phase (all plans complete)
-Status: Phase 1 complete — ready for Phase 2
-Last activity: 2026-02-28 — Plan 01-04 all tasks complete; human-verified with 704MB real export (1,032 conversations, 2023–2026)
+Phase: 2 of 5 (API Key + AI Clustering) — IN PROGRESS
+Plan: 1 of 8 complete (Plan 02-01 done)
+Status: Phase 2 underway — Rust backend foundation complete
+Last activity: 2026-02-28 — Plan 02-01 complete; keychain commands + schema columns + DB helpers
 
-Progress: [██████████] 20%
+Progress: [████████████] 24%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~13 min
-- Total execution time: ~54 min
+- Total plans completed: 5
+- Average duration: ~12 min
+- Total execution time: ~56 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-zip-parsing-foundation | 4/4 | ~54 min | ~13 min |
+| 02-api-key-ai-clustering | 1/8 | ~2 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 9m, 12m, 3m, ~30m
+- Last 5 plans: 9m, 12m, 3m, ~30m, 2m
 - Trend: stable
 
 *Updated after each plan completion*
@@ -60,6 +61,10 @@ Recent decisions affecting current work:
 - [01-04]: Browse link uses @tauri-apps/plugin-dialog open() with zip extension filter — native macOS file picker
 - [01-04]: SQLite Connection::open requires parent directory to exist — create_dir_all before DB init required on first launch (fixed post-verify)
 - [01-04]: conversations.json parsed as full array (from_str::<Vec<_>>) not StreamDeserializer; year range as plain integers — fixed post-verify after real 704MB export exposed mismatch
+- [Phase 02-api-key-ai-clustering]: SERVICE constant = com.darrellwhitelaw.chatgpt-to-claude matches app bundle ID for Keychain scoping
+- [Phase 02-api-key-ai-clustering]: get_api_key returns Err string on NoEntry (not panic) so React can detect first-launch awaiting-key AppPhase
+- [Phase 02-api-key-ai-clustering]: reqwest uses rustls-tls with default-features=false to avoid bundling OpenSSL on macOS
+- [Phase 02-api-key-ai-clustering]: schema.sql uses CREATE TABLE IF NOT EXISTS so existing dev DBs need manual deletion to pick up cluster_label, summary, instructions columns
 
 ### Pending Todos
 
@@ -74,5 +79,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Phase 1 complete — Plan 01-04 fully verified (1,032 conversations from 704MB export). Ready for Phase 2.
+Stopped at: Completed 02-api-key-ai-clustering/02-01-PLAN.md — keychain commands + schema + DB helpers. Ready for Plan 02-02.
 Resume file: None
