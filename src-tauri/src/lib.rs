@@ -1,5 +1,5 @@
 mod commands;
-mod pipeline;
+pub mod pipeline;
 mod store;
 
 use rusqlite::Connection;
