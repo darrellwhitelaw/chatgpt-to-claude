@@ -48,14 +48,14 @@ Plans:
   3. After user confirms, app submits conversations to Claude Batch API and displays polling progress until the batch completes
   4. Each conversation is assigned to a named project group in SQLite when clustering finishes
   5. App generates an AI summary (key decisions, conclusions, context) and extracts custom instructions/system prompts for each conversation
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 02-01: macOS Keychain integration for API key (Tauri plugin or Rust keyring crate)
-- [ ] 02-02: API key entry UI — first-launch detection, key entry form, key management
-- [ ] 02-03: Cost estimation — token counting, approximate dollar display before batch submission
-- [ ] 02-04: Batch API clustering orchestrator — chunking, submission, polling, SQLite assignment writes
-- [ ] 02-05: Per-conversation AI summary generation and system prompt extraction
+- [ ] 02-01-PLAN.md — Keychain backend: keyring crate commands (get/set/delete), SQLite schema extension (cluster_label, summary, instructions), Cargo.toml additions
+- [ ] 02-02-PLAN.md — TypeScript type layer: AppPhase extension (8 variants), AppState fields, ClusterEvent IPC bindings
+- [ ] 02-03-PLAN.md — API key UI: useKeychain hook, ApiKeyScreen (password input + inline error), SummaryCard "Change key" link, App.tsx routing
+- [ ] 02-04-PLAN.md — Cost estimation: estimate_cost Rust command (/v1/messages/count_tokens), CostScreen (token count + USD + warning callout), Proceed/Cancel flow
+- [ ] 02-05-PLAN.md — Batch clustering orchestrator: two-pass (Pass 1 vocab + Pass 2 batch), poll loop, JSONL result parsing, SQLite writes, ClusteringView UI
 
 ### Phase 3: Preview + Manifest Editing
 **Goal**: User can see the proposed project structure (project names and conversation counts) and make adjustments before any files are written to disk
@@ -117,7 +117,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. ZIP Parsing Foundation | 4/4 | Complete | 2026-02-28 |
-| 2. API Key + AI Clustering | 0/5 | Not started | - |
+| 2. API Key + AI Clustering | 0/5 | Planning done | - |
 | 3. Preview + Manifest Editing | 0/2 | Not started | - |
 | 4. Output Folder Generation | 0/6 | Not started | - |
 | 5. Polish + Distribution | 0/5 | Not started | - |
