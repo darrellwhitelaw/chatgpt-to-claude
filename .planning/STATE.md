@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 1 of 5 (ZIP Parsing Foundation)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-28 — Plan 01-01 complete (scaffold, SQLite schema, parse_zip stub)
+Last activity: 2026-02-28 — Plan 01-02 complete (streaming ZIP/JSON pipeline, normalizer, SQLite insert)
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 9 min
-- Total execution time: 9 min
+- Total plans completed: 2
+- Average duration: 10.5 min
+- Total execution time: 21 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-zip-parsing-foundation | 1/4 | 9 min | 9 min |
+| 01-zip-parsing-foundation | 2/4 | 21 min | 10.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 9m
-- Trend: baseline
+- Last 5 plans: 9m, 12m
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -49,6 +49,9 @@ Recent decisions affecting current work:
 - [01-01]: Window height 528px outer (not 500px) — macOS title bar consumes ~28px; gives 500px usable content area
 - [01-01]: rusqlite bundled feature — embeds SQLite so no system library dependency; required for portable DMG distribution
 - [01-01]: parse_zip stub uses _path prefix — suppresses unused variable warning while keeping full IPC signature for plan 01-02
+- [01-02]: Vec<u8>/Cursor for ZIP entry — ZipFile borrow-lifetime issue resolved by reading bytes then wrapping in BufReader<Cursor>
+- [01-02]: into_iter() not StreamDeserializer — conversations.json is a single top-level array; StreamDeserializer is for NDJSON
+- [01-02]: traversal module commented out in mod.rs — plan 01-03 adds it; prevents compile error before that plan runs
 
 ### Pending Todos
 
@@ -63,5 +66,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 01-01-PLAN.md — scaffold + SQLite schema + parse_zip stub, all clean
+Stopped at: Completed 01-02-PLAN.md — streaming ZIP/JSON pipeline, normalizer, SQLite insert, full parse_zip command
 Resume file: None
