@@ -51,8 +51,8 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Keychain backend: keyring crate commands (get/set/delete), SQLite schema extension (cluster_label, summary, instructions), Cargo.toml additions
-- [ ] 02-02-PLAN.md — TypeScript type layer: AppPhase extension (8 variants), AppState fields, ClusterEvent IPC bindings
+- [x] 02-01-PLAN.md — Keychain backend: keyring crate commands (get/set/delete), SQLite schema extension (cluster_label, summary, instructions), Cargo.toml additions
+- [x] 02-02-PLAN.md — TypeScript type layer: AppPhase extension (8 variants), AppState fields, ClusterEvent IPC bindings
 - [ ] 02-03-PLAN.md — API key UI: useKeychain hook, ApiKeyScreen (password input + inline error), SummaryCard "Change key" link, App.tsx routing
 - [ ] 02-04-PLAN.md — Cost estimation: estimate_cost Rust command (/v1/messages/count_tokens), CostScreen (token count + USD + warning callout), Proceed/Cancel flow
 - [ ] 02-05-PLAN.md — Batch clustering orchestrator: two-pass (Pass 1 vocab + Pass 2 batch), poll loop, JSONL result parsing, SQLite writes, ClusteringView UI
@@ -117,7 +117,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. ZIP Parsing Foundation | 4/4 | Complete | 2026-02-28 |
-| 2. API Key + AI Clustering | 0/5 | Planning done | - |
+| 2. API Key + AI Clustering | 2/5 | In progress | - |
 | 3. Preview + Manifest Editing | 0/2 | Not started | - |
 | 4. Output Folder Generation | 0/6 | Not started | - |
 | 5. Polish + Distribution | 0/5 | Not started | - |

@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (API Key + AI Clustering) — IN PROGRESS
-Plan: 1 of 8 complete (Plan 02-01 done)
-Status: Phase 2 underway — Rust backend foundation complete
-Last activity: 2026-02-28 — Plan 02-01 complete; keychain commands + schema columns + DB helpers
+Plan: 2 of 8 complete (Plan 02-02 done)
+Status: Phase 2 underway — TypeScript type layer complete
+Last activity: 2026-02-28 — Plan 02-02 complete; AppPhase extended to 8 variants, ClusterEvent IPC bindings added
 
 Progress: [████████████] 24%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: ~12 min
 - Total execution time: ~56 min
 
@@ -28,7 +28,7 @@ Progress: [████████████] 24%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-zip-parsing-foundation | 4/4 | ~54 min | ~13 min |
-| 02-api-key-ai-clustering | 1/8 | ~2 min | ~2 min |
+| 02-api-key-ai-clustering | 2/8 | ~4 min | ~2 min |
 
 **Recent Trend:**
 - Last 5 plans: 9m, 12m, 3m, ~30m, 2m
@@ -65,6 +65,9 @@ Recent decisions affecting current work:
 - [Phase 02-api-key-ai-clustering]: get_api_key returns Err string on NoEntry (not panic) so React can detect first-launch awaiting-key AppPhase
 - [Phase 02-api-key-ai-clustering]: reqwest uses rustls-tls with default-features=false to avoid bundling OpenSSL on macOS
 - [Phase 02-api-key-ai-clustering]: schema.sql uses CREATE TABLE IF NOT EXISTS so existing dev DBs need manual deletion to pick up cluster_label, summary, instructions columns
+- [02-02]: AppPhase is a flat string union — simple to switch on, no nested objects, consistent with Phase 1 pattern
+- [02-02]: ClusterEvent uses event discriminant key to match IngestEvent convention already in bindings.ts
+- [02-02]: setClusterError routes to 'error' phase (not a new 'clustering-error') — single error phase covers both Phase 1 and Phase 2 error UI
 
 ### Pending Todos
 
@@ -79,5 +82,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-api-key-ai-clustering/02-01-PLAN.md — keychain commands + schema + DB helpers. Ready for Plan 02-02.
+Stopped at: Completed 02-api-key-ai-clustering/02-02-PLAN.md — AppPhase extension + ClusterEvent IPC bindings. Ready for Plan 02-03.
 Resume file: None
