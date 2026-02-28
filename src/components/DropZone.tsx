@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { open } from '@tauri-apps/plugin-dialog';
-import { Upload } from 'lucide-react';
+import openaiZipIcon from '../assets/openai_zip_icon.png';
 import { useIngest } from '../hooks/useIngest';
 
 interface DropZoneProps {
@@ -69,10 +69,11 @@ export function DropZone({ errorMessage, onReset }: DropZoneProps) {
             : 'border-neutral-300 bg-white',
         ].join(' ')}
       >
-        {/* Upload icon */}
-        <Upload
-          className={`w-10 h-10 ${isDragging ? 'text-neutral-500' : 'text-neutral-400'}`}
-          strokeWidth={1.5}
+        {/* ChatGPT ZIP icon */}
+        <img
+          src={openaiZipIcon}
+          alt="ChatGPT export"
+          className={`w-16 h-16 object-contain transition-opacity duration-150 ${isDragging ? 'opacity-70' : 'opacity-100'}`}
         />
 
         {/* Single instruction line — exact copy locked in CONTEXT.md */}
