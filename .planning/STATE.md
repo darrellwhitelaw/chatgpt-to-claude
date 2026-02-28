@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 5 (API Key + AI Clustering) — IN PROGRESS
-Plan: 4 of 8 complete (Plan 02-04 done)
-Status: Phase 2 underway — cost estimation screen complete with token count + USD display
-Last activity: 2026-02-28 — Plan 02-04 complete; estimate_cost command, CostScreen, useCluster hook, App.tsx cost-ready routing
+Plan: 5 of 8 complete (Plan 02-05 done)
+Status: Phase 2 underway — two-pass AI clustering pipeline complete; ClusteringView UI, JSONL result parsing, SQLite writes for cluster_label + summary + instructions
+Last activity: 2026-02-28 — Plan 02-05 complete; start_clustering command, ai/ module (batch.rs + prompts.rs), ClusteringView, useCluster startClustering
 
-Progress: [██████████████] 29%
+Progress: [████████████████] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: ~11 min
 - Total execution time: ~63 min
 
@@ -28,13 +28,14 @@ Progress: [██████████████] 29%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-zip-parsing-foundation | 4/4 | ~54 min | ~13 min |
-| 02-api-key-ai-clustering | 4/8 | ~12 min | ~3 min |
+| 02-api-key-ai-clustering | 5/8 | ~16 min | ~3 min |
 
 **Recent Trend:**
 - Last 5 plans: 12m, 3m, ~30m, 2m, 7m
 - Trend: stable
 
 *Updated after each plan completion*
+| Phase 02-api-key-ai-clustering P05 | 4 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,10 @@ Recent decisions affecting current work:
 - [02-04]: useCluster bad-key path uses useAppStore.setState atomically (clusterError + phase) to avoid intermediate 'error' phase flash from setClusterError action
 - [02-04]: CostScreen Proceed uses setClustering('pending') placeholder batchId — replaced in Plan 02-05 with real batch invocation
 - [02-04]: Cancel returns to 'complete' phase via direct setState — Zustand allows direct setState outside of actions
+- [Phase 02-05]: tokio time feature added explicitly to Cargo.toml — not transitively exposed despite Tauri using tokio internally
+- [Phase 02-05]: startClustering sets phase=clustering immediately before Tauri command invocation so ClusteringView renders during Pass 1
+- [Phase 02-05]: Direct useAppStore.setState for stage updates in clustering flow — setStage action sets phase=parsing which breaks clustering phase gate
+- [Phase 02-05]: CostScreen accepts onProceed prop — removes direct store coupling, enables App.tsx to inject startClustering
 
 ### Pending Todos
 
@@ -88,5 +93,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-api-key-ai-clustering/02-04-PLAN.md — estimate_cost Tauri command, CostScreen with token + USD display, useCluster hook, App.tsx cost-ready routing. Ready for Plan 02-05.
+Stopped at: Completed 02-api-key-ai-clustering/02-05-PLAN.md — two-pass AI clustering pipeline (Pass 1 vocab + Pass 2 batch), ClusteringView UI, startClustering hook, SQLite writes for cluster_label + summary + instructions. Ready for Plan 02-06.
 Resume file: None

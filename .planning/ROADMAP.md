@@ -13,7 +13,7 @@ Five sequential phases, each delivering a coherent capability that unblocks the 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: ZIP Parsing Foundation** - User drops a ChatGPT export ZIP and the app streams, parses, and stores all conversations in SQLite
-- [ ] **Phase 2: API Key + AI Clustering** - User enters their API key and the app clusters all conversations into named project groups via Claude Batch API
+- [x] **Phase 2: API Key + AI Clustering** - User enters their API key and the app clusters all conversations into named project groups via Claude Batch API (completed 2026-02-28)
 - [ ] **Phase 3: Preview + Manifest Editing** - User reviews the proposed project structure and confirms before any files are written
 - [ ] **Phase 4: Output Folder Generation** - App writes the full per-project Markdown output folder the user drags into Claude.ai Projects
 - [ ] **Phase 5: Polish + Distribution** - App ships as a signed, notarized DMG with cancel support, retry logic, and native macOS feel
@@ -117,7 +117,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. ZIP Parsing Foundation | 4/4 | Complete | 2026-02-28 |
-| 2. API Key + AI Clustering | 4/5 | In Progress|  |
+| 2. API Key + AI Clustering | 5/5 | Complete   | 2026-02-28 |
 | 3. Preview + Manifest Editing | 0/2 | Not started | - |
 | 4. Output Folder Generation | 0/6 | Not started | - |
 | 5. Polish + Distribution | 0/5 | Not started | - |
