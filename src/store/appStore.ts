@@ -28,6 +28,7 @@ interface AppState {
   costEstimateUsd: number | null;    // computed cost in USD
   batchId: string | null;            // Anthropic batch ID from submission
   clusterError: string | null;       // error message for clustering failure screen
+  elapsedSecs: number;               // seconds elapsed during batch polling — set by useCluster on polling events
 
   // Phase 1 actions
   setStage: (stage: string) => void;
@@ -55,6 +56,7 @@ export const useAppStore = create<AppState>((set) => ({
   costEstimateUsd: null,
   batchId: null,
   clusterError: null,
+  elapsedSecs: 0,
 
   // Phase 1 actions
   setStage: (stage) => set({ phase: 'parsing', stage, error: null }),
@@ -62,7 +64,7 @@ export const useAppStore = create<AppState>((set) => ({
   setComplete: (summary) => set({ phase: 'complete', summary }),
   reset: () => set({
     phase: 'idle', stage: '', error: null, summary: null,
-    tokenEstimate: null, costEstimateUsd: null, batchId: null, clusterError: null,
+    tokenEstimate: null, costEstimateUsd: null, batchId: null, clusterError: null, elapsedSecs: 0,
   }),
 
   // Phase 2 actions

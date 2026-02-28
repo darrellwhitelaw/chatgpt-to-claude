@@ -8,6 +8,7 @@ import { ProgressView } from './components/ProgressView';
 import { SummaryCard } from './components/SummaryCard';
 import { ApiKeyScreen } from './screens/ApiKeyScreen';
 import { CostScreen } from './screens/CostScreen';
+import { ClusteringView } from './screens/ClusteringView';
 
 export default function App() {
   const {
@@ -21,9 +22,10 @@ export default function App() {
     clusterError,
     tokenEstimate,
     costEstimateUsd,
+    elapsedSecs,
   } = useAppStore();
   const { getApiKey } = useKeychain();
-  const { fetchCostEstimate } = useCluster();
+  const { fetchCostEstimate, startClustering } = useCluster();
 
   // Auto-trigger cost estimation when phase transitions to key-stored
   useEffect(() => {
@@ -45,7 +47,24 @@ export default function App() {
     <div className="h-screen w-screen bg-white flex items-center justify-center pb-8">
       {phase === 'idle' && <DropZone />}
       {phase === 'parsing' && <ProgressView stage={stage} />}
-      {phase === 'error' && <DropZone errorMessage={error ?? undefined} onReset={reset} />}
+
+      {/* Phase 1 error — parse failure — returns to drop zone */}
+      {phase === 'error' && !clusterError && (
+        <DropZone errorMessage={error ?? undefined} onReset={reset} />
+      )}
+      {/* Phase 2 error — clustering failure — "Try again" returns to cost screen */}
+      {phase === 'error' && clusterError && (
+        <div className="flex flex-col items-center gap-4 text-center px-6">
+          <p className="text-sm text-red-500">{clusterError}</p>
+          <button
+            onClick={() => useAppStore.setState({ phase: 'cost-ready', clusterError: null })}
+            className="text-sm text-neutral-500 hover:text-neutral-700 underline underline-offset-2"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {phase === 'complete' && summary && (
         <SummaryCard
           total={summary.total}
@@ -64,11 +83,14 @@ export default function App() {
         <ProgressView stage="Counting tokens..." />
       )}
       {phase === 'cost-ready' && tokenEstimate !== null && costEstimateUsd !== null && (
-        <CostScreen tokens={tokenEstimate} estimatedUsd={costEstimateUsd} />
+        <CostScreen
+          tokens={tokenEstimate}
+          estimatedUsd={costEstimateUsd}
+          onProceed={startClustering}
+        />
       )}
       {phase === 'clustering' && (
-        // ClusteringView renders here — Plan 02-05 replaces this placeholder
-        <ProgressView stage={stage} />
+        <ClusteringView stage={stage} elapsedSecs={elapsedSecs} />
       )}
       {phase === 'clustering-complete' && (
         // Phase 3 entry point — placeholder

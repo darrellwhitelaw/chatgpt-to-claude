@@ -3,21 +3,14 @@ import { useAppStore } from '../store/appStore';
 interface CostScreenProps {
   tokens: number;
   estimatedUsd: number;
+  onProceed: () => void;
 }
 
-export function CostScreen({ tokens, estimatedUsd }: CostScreenProps) {
-  const { setClustering } = useAppStore();
-
+export function CostScreen({ tokens, estimatedUsd, onProceed }: CostScreenProps) {
   const formatTokens = (n: number): string => {
     if (n >= 1_000_000) return `~${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000) return `~${Math.round(n / 1_000)}K`;
     return `${n}`;
-  };
-
-  const handleProceed = () => {
-    // Plan 02-05 will invoke the actual batch command here.
-    // For now, transition phase to trigger ClusteringView placeholder.
-    setClustering('pending'); // placeholder batchId — replaced in 02-05
   };
 
   const handleCancel = () => {
@@ -46,7 +39,7 @@ export function CostScreen({ tokens, estimatedUsd }: CostScreenProps) {
       {/* Actions */}
       <div className="flex flex-col items-center gap-3 w-full">
         <button
-          onClick={handleProceed}
+          onClick={onProceed}
           className="w-full px-8 py-2.5 rounded-lg bg-neutral-900 text-white text-sm font-medium
                      hover:bg-neutral-700 transition-colors"
         >
