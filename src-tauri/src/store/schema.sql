@@ -8,5 +8,8 @@ CREATE TABLE IF NOT EXISTS conversations (
     token_estimate INTEGER NOT NULL DEFAULT 0,
     full_text TEXT NOT NULL DEFAULT '',
     cluster_id TEXT,
-    project_name TEXT
+    project_name TEXT,
+    cluster_label TEXT,
+    summary TEXT,
+    instructions TEXT
 );
