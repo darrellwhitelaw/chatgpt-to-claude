@@ -110,6 +110,9 @@ pub async fn export_conversations(
         let _ = copy_shared_conversations(zp, &root);
     }
 
+    // Always regenerate INDEX.md — it's a pure data file, not user-editable
+    let _ = generate_index(&root, &conversations);
+
     // Generate START_HERE.md once — preserved if user edits it
     let readme_path = root.join("START_HERE.md");
     if !readme_path.exists() {
@@ -332,6 +335,54 @@ fn read_user_name(zip_path: &str) -> Option<String> {
     None
 }
 
+// ── INDEX.md generation ───────────────────────────────────────────────────────
+
+/// Generates INDEX.md — all conversation titles and dates grouped by year.
+/// This is the fast-path for Phase 1: Claude reads one file instead of opening
+/// 20-30 individual markdown files to understand what's in the history.
+/// Always regenerated on export so it stays current.
+fn generate_index(root: &PathBuf, conversations: &[db::ExportRow]) -> Result<(), String> {
+    // Group by year, most recent first
+    let mut by_year: std::collections::BTreeMap<String, Vec<(&str, Option<i64>)>> =
+        std::collections::BTreeMap::new();
+
+    for conv in conversations {
+        let year = conv.created_at
+            .map(|ts| unix_to_year(ts))
+            .unwrap_or_else(|| "Unknown".to_string());
+        let title = conv.title.as_deref().unwrap_or("Untitled");
+        by_year.entry(year).or_default().push((title, conv.created_at));
+    }
+
+    let total = conversations.len();
+    let years: Vec<String> = by_year.keys().cloned().collect();
+    let year_range = match (years.first(), years.last()) {
+        (Some(lo), Some(hi)) if lo != hi => format!("{}–{}", lo, hi),
+        (Some(y), _) => y.clone(),
+        _ => "Unknown".to_string(),
+    };
+
+    let mut content = format!(
+        "# Conversation Index\n\n_{total} conversations · {year_range}_\n\n\
+         > **For Claude:** Read this file to understand the full history at a glance.\n\
+         > Titles are usually descriptive enough to identify topics and projects.\n\
+         > Open individual files only for conversations you want to examine closely.\n\n---\n\n"
+    );
+
+    // Write years in reverse (most recent first — more relevant for active projects)
+    for year in by_year.keys().rev() {
+        let convs = &by_year[year];
+        content.push_str(&format!("## {} ({} conversations)\n\n", year, convs.len()));
+        for (title, ts) in convs {
+            let date = ts.map(|t| unix_to_date_str(t)).unwrap_or_default();
+            content.push_str(&format!("- **{}** · {}\n", title, date));
+        }
+        content.push('\n');
+    }
+
+    std::fs::write(root.join("INDEX.md"), content).map_err(|e| e.to_string())
+}
+
 // ── START_HERE.md generation ──────────────────────────────────────────────────
 
 fn generate_readme(
@@ -427,6 +478,9 @@ fn generate_readme(
 r#"# ChatGPT History
 
 > **For Claude — read this entire file before your first response.**
+>
+> **Model:** Use **claude-sonnet** for this session. The task is reading and pattern-matching
+> across many files — Sonnet handles it well and won't burn through your Opus quota.
 
 ---
 
@@ -436,6 +490,8 @@ My complete ChatGPT conversation history: **{count} conversations, {year_range}.
 
 ```
 ChatGPT History/
+  START_HERE.md       ← you are here
+  INDEX.md            ← all titles and dates — read this first in Phase 1
   2023/ 2024/ 2025/   ← conversations by year, one .md file each
 {extra_folders}```
 
@@ -463,17 +519,19 @@ Walk me through this in order. Don't skip ahead without my confirmation.
 
 Do this immediately when I connect you:
 
-1. List all year folders and count the `.md` files in each
-2. Read 20–30 files spread across different years — not just titles, open and skim the content
-3. Look specifically for: recurring project names, shared vocabulary, unfinished threads, topics I kept returning to
+1. **Read `INDEX.md` first.** It lists every conversation title and date grouped by year.
+   This gives you a full picture of the history in one read — no need to open individual files yet.
+2. From the titles alone, identify 5–8 recurring themes, projects, or topic clusters.
+3. Open **10–15 individual files** for the conversations that look most significant or ambiguous
+   from their titles — spread across years, focus on ones that could anchor a project folder.
 4. Report back with:
    - Total conversations and years covered
-   - 5–8 major themes or projects you identified from content and titles
-   - 2–3 conversations that look like they might be unfinished or worth picking up
+   - 5–8 major themes or projects you identified
+   - 2–3 conversations that look like unfinished or active work worth picking up
 
 **Important:** ChatGPT's export does not include project folder membership — that data is
 not in the export. You cannot recover which Project a conversation belonged to. You must
-infer groupings entirely from content, titles, dates, and patterns you find by reading.
+infer groupings from titles, dates, and the content of files you open.
 
 Then ask:
 
@@ -482,7 +540,7 @@ Then ask:
 > That tells me what projects you had so I can match conversations to them instead of guessing."
 
 If I share a screenshot, use the project names you see as your folder structure anchors.
-If I skip it, proceed using what you found in the content scan.
+If I skip it, proceed using what you found.
 
 ---
 
