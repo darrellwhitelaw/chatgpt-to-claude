@@ -23,8 +23,8 @@
 
 - [x] **AI-01**: App uses the Anthropic Message Batches API to cluster conversations by topic into named project groups
 - [x] **AI-02**: App shows an estimated API cost (tokens + approximate $) to the user before the clustering batch is submitted
-- [ ] **AI-03**: App generates an AI summary for each conversation (key decisions, conclusions, context)
-- [ ] **AI-04**: App extracts custom instructions and system prompts from ChatGPT conversations into a separate file per project
+- [x] **AI-03**: App generates an AI summary for each conversation (key decisions, conclusions, context)
+- [x] **AI-04**: App extracts custom instructions and system prompts from ChatGPT conversations into a separate file per project
 
 ### Preview
 
@@ -100,8 +100,8 @@
 | SEC-02 | Phase 2 | Complete |
 | AI-01 | Phase 2 | Complete |
 | AI-02 | Phase 2 | Complete |
-| AI-03 | Phase 2 | Pending |
-| AI-04 | Phase 2 | Pending |
+| AI-03 | Phase 2 | Complete |
+| AI-04 | Phase 2 | Complete |
 | PREV-01 | Phase 3 | Pending |
 | PREV-02 | Phase 3 | Pending |
 | OUT-01 | Phase 4 | Pending |

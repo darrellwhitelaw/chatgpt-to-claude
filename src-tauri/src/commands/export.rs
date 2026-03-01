@@ -16,11 +16,11 @@ pub struct ExportResult {
 /// Exports all conversations as markdown files to ~/Documents/ChatGPT History/
 /// organized into year-based folders, then extracts all media files, group chats,
 /// and supplementary data from the original ZIP, auto-configures the Claude Desktop
-/// MCP filesystem server, and generates a README.md with instructions for Claude.
+/// MCP filesystem server, and generates a START_HERE.md with instructions for Claude.
 ///
 /// Structure:
 ///   ~/Documents/ChatGPT History/
-///     README.md          ← instructions + context for Claude
+///     START_HERE.md      ← instructions + context for Claude
 ///     2023/ 2024/ 2025/  ← conversations by year
 ///     group-chats/       ← group_chats.json exported as markdown
 ///     media/             ← all images from the ZIP
@@ -105,8 +105,8 @@ pub async fn export_conversations(
         let _ = copy_shared_conversations(zp, &root);
     }
 
-    // Generate README.md once — preserved if user edits it
-    let readme_path = root.join("README.md");
+    // Generate START_HERE.md once — preserved if user edits it
+    let readme_path = root.join("START_HERE.md");
     if !readme_path.exists() {
         let _ = generate_readme(
             &root,
@@ -327,7 +327,7 @@ fn read_user_name(zip_path: &str) -> Option<String> {
     None
 }
 
-// ── README.md generation ──────────────────────────────────────────────────────
+// ── START_HERE.md generation ──────────────────────────────────────────────────
 
 fn generate_readme(
     root: &PathBuf,
@@ -508,7 +508,7 @@ _Generated from {count} conversations ({year_range}) · edit freely, this file w
         name_line = name_line,
     );
 
-    std::fs::write(root.join("README.md"), content).map_err(|e| e.to_string())
+    std::fs::write(root.join("START_HERE.md"), content).map_err(|e| e.to_string())
 }
 
 // ── Topic extraction ──────────────────────────────────────────────────────────
