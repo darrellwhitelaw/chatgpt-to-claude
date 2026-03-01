@@ -388,9 +388,12 @@ fn generate_readme(
         String::new()
     } else {
         let mut s = String::from(
-            "---\n\n## Custom GPT clusters (gizmo IDs)\n\n\
-            These conversations were made with the same custom ChatGPT — a strong signal they belong together.\n\
-            Use these groups to anchor your project bucketing in Phase 2.\n\
+            "---\n\n## Custom GPT usage (gizmo IDs)\n\n\
+            These conversations were made with the same custom ChatGPT configuration.\n\
+            Note: this does NOT map to a ChatGPT Project — project folder membership is not\n\
+            included in the export. A shared gizmo ID only means the same custom GPT was used;\n\
+            treat it as a weak supporting hint, not a definitive project grouping.\n\
+            Use content, titles, and dates as your primary bucketing signals.\n\
             Each conversation file contains `<!-- gizmo:ID -->` in its header so you can grep for these.\n\n"
         );
         for (gid, titles) in &gizmo_clusters {
@@ -461,12 +464,25 @@ Walk me through this in order. Don't skip ahead without my confirmation.
 Do this immediately when I connect you:
 
 1. List all year folders and count the `.md` files in each
-2. Skim 20–30 file titles spread across different years
-3. Look specifically for: recurring project names, unfinished threads, topics I kept returning to
+2. Read 20–30 files spread across different years — not just titles, open and skim the content
+3. Look specifically for: recurring project names, shared vocabulary, unfinished threads, topics I kept returning to
 4. Report back with:
    - Total conversations and years covered
-   - 5–8 major themes or projects you identified from the titles
+   - 5–8 major themes or projects you identified from content and titles
    - 2–3 conversations that look like they might be unfinished or worth picking up
+
+**Important:** ChatGPT's export does not include project folder membership — that data is
+not in the export. You cannot recover which Project a conversation belonged to. You must
+infer groupings entirely from content, titles, dates, and patterns you find by reading.
+
+Then ask:
+
+> "Before I propose a structure, it would help a lot to see your ChatGPT Projects sidebar.
+> Can you take a screenshot of it — just the left panel showing your project folder names?
+> That tells me what projects you had so I can match conversations to them instead of guessing."
+
+If I share a screenshot, use the project names you see as your folder structure anchors.
+If I skip it, proceed using what you found in the content scan.
 
 ---
 
@@ -485,16 +501,12 @@ Topics/
 Archive/              ← older one-off conversations not tied to current work
 ```
 
-**Gizmo IDs are your strongest bucketing signal.** Each conversation file contains a
-`<!-- gizmo:ID -->` HTML comment in its header. Conversations sharing the same gizmo ID
-were all done with the same custom ChatGPT — they almost certainly belong in the same
-project bucket. Check the "Custom GPT clusters" section below and use those groups as
-anchors before inferring structure from titles alone.
+Your primary bucketing signals are: **content**, **titles**, **dates**, and **recurring vocabulary**.
+Base your structure on what you actually read, not on metadata alone.
 
-You can grep for a specific gizmo ID across the whole folder:
-```
-grep -rl "gizmo:g-XXXXX" .
-```
+Gizmo IDs (in the "Custom GPT usage" section below) are a weak supporting hint — conversations
+sharing an ID used the same custom ChatGPT, but that does not mean they belong to the same
+project. Use them only to cross-check groupings you've already formed from content.
 
 Ask me: "Does this structure look right? Anything to rename, merge, or add?"
 Wait for my approval before doing anything.
