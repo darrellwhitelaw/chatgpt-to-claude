@@ -80,10 +80,15 @@ pub async fn export_conversations(
             .map(|ts| format!("_{}_\n\n", unix_to_date_str(ts)))
             .unwrap_or_default();
 
+        let gizmo_line = conv.gizmo_id.as_ref()
+            .map(|g| format!("<!-- gizmo:{} -->\n\n", g))
+            .unwrap_or_default();
+
         let content = format!(
-            "# {}\n\n{}---\n\n{}\n",
+            "# {}\n\n{}{}---\n\n{}\n",
             title,
             date_line,
+            gizmo_line,
             conv.full_text.trim()
         );
 
@@ -341,6 +346,21 @@ fn generate_readme(
         .collect();
     let top_topics = extract_top_topics(&all_titles, 15);
 
+    // Build gizmo clusters: gizmo_id → list of conversation titles
+    let mut gizmo_map: HashMap<String, Vec<String>> = HashMap::new();
+    for conv in conversations {
+        if let Some(ref gid) = conv.gizmo_id {
+            let title = conv.title.clone().unwrap_or_else(|| "Untitled".to_string());
+            gizmo_map.entry(gid.clone()).or_default().push(title);
+        }
+    }
+    // Only surface gizmos used in 2+ conversations (single-use isn't a signal)
+    let mut gizmo_clusters: Vec<(String, Vec<String>)> = gizmo_map
+        .into_iter()
+        .filter(|(_, titles)| titles.len() >= 2)
+        .collect();
+    gizmo_clusters.sort_by(|a, b| b.1.len().cmp(&a.1.len()));
+
     let years: Vec<i32> = conversations.iter()
         .filter_map(|c| c.created_at)
         .filter_map(|ts| unix_to_year(ts).parse::<i32>().ok())
@@ -361,6 +381,30 @@ fn generate_readme(
         "_(none detected)_".to_string()
     } else {
         top_topics.iter().map(|t| format!("- {}", t)).collect::<Vec<_>>().join("\n")
+    };
+
+    // Build gizmo clusters section for START_HERE.md
+    let gizmo_section = if gizmo_clusters.is_empty() {
+        String::new()
+    } else {
+        let mut s = String::from(
+            "---\n\n## Custom GPT clusters (gizmo IDs)\n\n\
+            These conversations were made with the same custom ChatGPT — a strong signal they belong together.\n\
+            Use these groups to anchor your project bucketing in Phase 2.\n\
+            Each conversation file contains `<!-- gizmo:ID -->` in its header so you can grep for these.\n\n"
+        );
+        for (gid, titles) in &gizmo_clusters {
+            s.push_str(&format!("### `{}`  ({} conversations)\n\n", gid, titles.len()));
+            // Show up to 8 example titles
+            for title in titles.iter().take(8) {
+                s.push_str(&format!("- {}\n", title));
+            }
+            if titles.len() > 8 {
+                s.push_str(&format!("- _…and {} more_\n", titles.len() - 8));
+            }
+            s.push('\n');
+        }
+        s
     };
 
     let name_line = user_name
@@ -441,6 +485,17 @@ Topics/
 Archive/              ← older one-off conversations not tied to current work
 ```
 
+**Gizmo IDs are your strongest bucketing signal.** Each conversation file contains a
+`<!-- gizmo:ID -->` HTML comment in its header. Conversations sharing the same gizmo ID
+were all done with the same custom ChatGPT — they almost certainly belong in the same
+project bucket. Check the "Custom GPT clusters" section below and use those groups as
+anchors before inferring structure from titles alone.
+
+You can grep for a specific gizmo ID across the whole folder:
+```
+grep -rl "gizmo:g-XXXXX" .
+```
+
 Ask me: "Does this structure look right? Anything to rename, merge, or add?"
 Wait for my approval before doing anything.
 
@@ -499,13 +554,14 @@ What have I been trying to figure out for a long time?
 
 ---
 
-_Generated from {count} conversations ({year_range}) · edit freely, this file won't be overwritten_
+{gizmo_section}_Generated from {count} conversations ({year_range}) · edit freely, this file won't be overwritten_
 "#,
         count = conversations.len(),
         year_range = year_range,
         extra_folders = extra_folders,
         topics_list = topics_list,
         name_line = name_line,
+        gizmo_section = gizmo_section,
     );
 
     std::fs::write(root.join("START_HERE.md"), content).map_err(|e| e.to_string())

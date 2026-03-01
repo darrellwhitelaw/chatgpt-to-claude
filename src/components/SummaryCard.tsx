@@ -31,14 +31,18 @@ export function SummaryCard({
         />
 
         <div className="flex flex-col items-center gap-3">
-          <div className="flex flex-col items-center gap-1">
-            <p className="text-5xl font-thin text-neutral-800 tabular-nums">
-              {total.toLocaleString()}
+          <div className="flex flex-col items-center gap-2 text-center">
+            <p className="text-sm text-neutral-600 leading-relaxed">
+              You had{' '}
+              <span className="font-medium text-neutral-800">{total.toLocaleString()}</span>{' '}
+              conversation{total !== 1 ? 's' : ''} in your ChatGPT history
+              {earliestYear ? (
+                <>
+                  {' '}from{' '}
+                  <span className="font-medium text-neutral-800">{yearRange}</span>
+                </>
+              ) : null}
             </p>
-            <p className="text-sm text-neutral-500 leading-snug">
-              conversation{total !== 1 ? 's' : ''}
-            </p>
-            <p className="text-xs text-neutral-400">{yearRange}</p>
           </div>
 
           <button
