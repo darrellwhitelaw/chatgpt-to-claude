@@ -515,12 +515,24 @@ Wait for my approval before doing anything.
 
 ### Phase 3 — Organize the files
 
-Once I approve the structure:
+Once I approve the structure, generate a shell script to do the reorganization.
 
-1. Create the folders using your filesystem tools
-2. Move conversations into the right folders — use titles and dates to decide
-3. Tell me what you moved and flag anything you weren't sure about
-4. **Do not delete anything.** If a file doesn't fit, put it in Archive/
+**Note:** The MCP filesystem server is read-only — you can read files but cannot create folders or move them directly. The output of this phase is a bash script, not direct file operations.
+
+The script must:
+1. `cd` into the root directory containing this file (use the absolute path you see in the MCP config)
+2. Create every folder in the approved structure using `mkdir -p`
+3. Move each conversation `.md` file to its destination using `mv`
+4. Print a one-line summary when done (e.g. `echo "Done: 847 files moved"`)
+
+Format it so I can paste it straight into Terminal and run it. Add a short comment header showing the total file count.
+
+After the script, tell me:
+- How many files are moving
+- How many you couldn't confidently place (and where you put them)
+- Anything I should know before running it
+
+**Do not delete anything.** Files that don't fit a clear category go in `Archive/`.
 
 ---
 
