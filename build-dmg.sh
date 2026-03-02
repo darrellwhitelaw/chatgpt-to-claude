@@ -9,11 +9,11 @@
 
 set -e
 
-APP_NAME="ChatGPT to Claude"
-VERSION="0.1.0"
+APP_NAME="Move to Claude"
+VERSION="0.1.12"
 APP_BUNDLE="src-tauri/target/release/bundle/macos/$APP_NAME.app"
 OUT_DMG="src-tauri/target/release/bundle/dmg/${APP_NAME}_${VERSION}_aarch64.dmg"
-STAGING="/tmp/chatgpt-to-claude-dmg"
+STAGING="/tmp/move-to-claude-dmg"
 
 echo ""
 echo "  Building custom DMG..."
