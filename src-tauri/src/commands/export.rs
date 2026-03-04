@@ -1,3 +1,4 @@
+use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -11,6 +12,7 @@ pub struct ExportResult {
     pub folder_path: String,
     pub mcp_configured: bool,
     pub media_extracted: usize,
+    pub memory_path: Option<String>,
 }
 
 /// Exports all conversations as markdown files to ~/Documents/ChatGPT History/
@@ -28,6 +30,7 @@ pub struct ExportResult {
 #[tauri::command]
 pub async fn export_conversations(
     state: State<'_, AppState>,
+    export_dir: Option<String>,
 ) -> Result<ExportResult, String> {
     let conversations = {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
@@ -44,7 +47,10 @@ pub async fn export_conversations(
     };
 
     let home = std::env::var("HOME").map_err(|_| "Cannot determine home directory".to_string())?;
-    let root = PathBuf::from(&home).join("Documents").join("ChatGPT History");
+    let root = match export_dir {
+        Some(ref dir) => PathBuf::from(dir),
+        None => PathBuf::from(&home).join("Documents").join("ChatGPT History"),
+    };
     std::fs::create_dir_all(&root).map_err(|e| e.to_string())?;
 
     // Remove legacy Projects/ folder if present from an older export
@@ -129,12 +135,261 @@ pub async fn export_conversations(
     let export_path = root.to_string_lossy().to_string();
     let mcp_configured = update_claude_desktop_config(&home, &export_path).is_ok();
 
+    // Generate Claude Code auto-memory
+    let memory_path = {
+        let conn = state.db.lock().map_err(|e| e.to_string())?;
+        generate_claude_code_memory(&home, &export_path, &conversations, &conn)
+    };
+
     Ok(ExportResult {
         files_written,
         folder_path: export_path,
         mcp_configured,
         media_extracted: media_extracted + group_chats_written,
+        memory_path,
     })
+}
+
+// ── Claude Code memory generation ──────────────────────────────────────────────
+
+/// Derives the Claude Code project memory path from the export path.
+/// Claude Code stores per-project memory at ~/.claude/projects/-<path-with-dashes>/memory/
+fn derive_claude_code_project_path(home: &str, export_path: &str) -> PathBuf {
+    // Claude Code encodes the project path by replacing / with -
+    // e.g. /Users/chris/Documents/ChatGPT History → -Users-chris-Documents-ChatGPT History
+    let encoded = export_path.replace('/', "-");
+    PathBuf::from(home)
+        .join(".claude")
+        .join("projects")
+        .join(encoded)
+        .join("memory")
+}
+
+/// Generates MEMORY.md with cluster data (AI path). Kept under 200 lines.
+fn generate_memory_md_clustered(
+    dir: &PathBuf,
+    clusters: &[db::MemoryCluster],
+    total_count: usize,
+    year_range: &str,
+) -> Result<(), String> {
+    let mut content = String::new();
+    content.push_str("# ChatGPT History — Knowledge Base\n\n");
+    content.push_str(&format!(
+        "_{} conversations · {} · imported from ChatGPT export_\n\n",
+        total_count, year_range
+    ));
+    content.push_str("## Topic Clusters\n\n");
+    content.push_str("| Cluster | Conversations | Date Range |\n");
+    content.push_str("|---------|--------------|------------|\n");
+
+    for cluster in clusters {
+        let date_range = match (cluster.earliest, cluster.latest) {
+            (Some(e), Some(l)) => {
+                let ey = unix_to_year(e);
+                let ly = unix_to_year(l);
+                if ey == ly { ey } else { format!("{}–{}", ey, ly) }
+            }
+            _ => "—".to_string(),
+        };
+        content.push_str(&format!(
+            "| {} | {} | {} |\n",
+            cluster.cluster_label, cluster.count, date_range
+        ));
+    }
+
+    content.push_str("\n## Cluster Summaries\n\n");
+
+    // Budget remaining lines: ~200 total, header used ~10 + table rows
+    let lines_used = 10 + clusters.len();
+    let lines_per_cluster = if clusters.is_empty() {
+        0
+    } else {
+        (190usize.saturating_sub(lines_used)) / clusters.len()
+    };
+
+    for cluster in clusters {
+        content.push_str(&format!("### {}\n\n", cluster.cluster_label));
+        if let Some(ref summary) = cluster.summary {
+            // Truncate summary to fit within budget
+            let summary_lines: Vec<&str> = summary.lines().collect();
+            let max_lines = lines_per_cluster.saturating_sub(4).max(2);
+            let trimmed: Vec<&str> = summary_lines.into_iter().take(max_lines).collect();
+            content.push_str(&trimmed.join("\n"));
+            content.push_str("\n\n");
+        }
+        content.push_str(&format!(
+            "_See `{}.md` for details._\n\n",
+            slugify(&cluster.cluster_label)
+        ));
+    }
+
+    content.push_str("---\n_Auto-generated from ChatGPT export. Topic files have full details._\n");
+
+    std::fs::write(dir.join("MEMORY.md"), content).map_err(|e| e.to_string())
+}
+
+/// Generates MEMORY.md without cluster data (no-AI path). Uses conversation titles.
+fn generate_memory_md_unclustered(
+    dir: &PathBuf,
+    conversations: &[db::ExportRow],
+) -> Result<(), String> {
+    let all_titles: Vec<String> = conversations
+        .iter()
+        .filter_map(|c| c.title.clone())
+        .collect();
+    let top_topics = extract_top_topics(&all_titles, 20);
+
+    let years: Vec<i32> = conversations
+        .iter()
+        .filter_map(|c| c.created_at)
+        .filter_map(|ts| unix_to_year(ts).parse::<i32>().ok())
+        .collect();
+    let (earliest, latest) = years
+        .iter()
+        .fold((i32::MAX, i32::MIN), |(lo, hi), &y| (lo.min(y), hi.max(y)));
+    let year_range = if earliest == i32::MAX {
+        "Unknown".to_string()
+    } else if earliest == latest {
+        earliest.to_string()
+    } else {
+        format!("{}–{}", earliest, latest)
+    };
+
+    let mut content = String::new();
+    content.push_str("# ChatGPT History — Knowledge Base\n\n");
+    content.push_str(&format!(
+        "_{} conversations · {} · imported from ChatGPT export_\n\n",
+        conversations.len(),
+        year_range
+    ));
+
+    content.push_str("## Frequent Topics\n\n");
+    if top_topics.is_empty() {
+        content.push_str("_(no recurring topics detected)_\n\n");
+    } else {
+        for topic in &top_topics {
+            content.push_str(&format!("- {}\n", topic));
+        }
+        content.push_str("\n");
+    }
+
+    content.push_str("## Recent Conversations\n\n");
+    // Show last 50 conversations (most recent first) to stay under 200 lines
+    let recent: Vec<&db::ExportRow> = conversations.iter().rev().take(50).collect();
+    for conv in &recent {
+        let title = conv.title.as_deref().unwrap_or("Untitled");
+        let date = conv
+            .created_at
+            .map(|ts| unix_to_date_str(ts))
+            .unwrap_or_default();
+        content.push_str(&format!("- **{}** · {}\n", title, date));
+    }
+
+    content.push_str(
+        "\n---\n_Auto-generated from ChatGPT export. \
+         Run with AI analysis for richer cluster data._\n",
+    );
+
+    std::fs::write(dir.join("MEMORY.md"), content).map_err(|e| e.to_string())
+}
+
+/// Generates per-cluster topic files with full details.
+fn generate_topic_files(dir: &PathBuf, clusters: &[db::MemoryCluster]) -> Result<(), String> {
+    for cluster in clusters {
+        let filename = format!("{}.md", slugify(&cluster.cluster_label));
+        let mut content = String::new();
+        content.push_str(&format!("# {}\n\n", cluster.cluster_label));
+
+        let date_range = match (cluster.earliest, cluster.latest) {
+            (Some(e), Some(l)) => format!("{} to {}", unix_to_date_str(e), unix_to_date_str(l)),
+            _ => "Unknown".to_string(),
+        };
+        content.push_str(&format!(
+            "_{} conversations · {}_\n\n",
+            cluster.count, date_range
+        ));
+
+        if let Some(ref summary) = cluster.summary {
+            content.push_str("## Summary\n\n");
+            content.push_str(summary);
+            content.push_str("\n\n");
+        }
+
+        if let Some(ref instructions) = cluster.instructions {
+            content.push_str("## Key Patterns & Instructions\n\n");
+            content.push_str(instructions);
+            content.push_str("\n\n");
+        }
+
+        content.push_str("## Conversations\n\n");
+        for title in &cluster.titles {
+            content.push_str(&format!("- {}\n", title));
+        }
+        content.push('\n');
+
+        std::fs::write(dir.join(&filename), content).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+/// Orchestrates Claude Code memory generation. Returns the memory directory path on success.
+fn generate_claude_code_memory(
+    home: &str,
+    export_path: &str,
+    conversations: &[db::ExportRow],
+    conn: &Connection,
+) -> Option<String> {
+    let memory_dir = derive_claude_code_project_path(home, export_path);
+
+    // Ensure .claude directory exists (Claude Code must have been used at least once)
+    let claude_dir = PathBuf::from(home).join(".claude");
+    if !claude_dir.exists() {
+        return None;
+    }
+
+    if let Err(_) = std::fs::create_dir_all(&memory_dir) {
+        return None;
+    }
+
+    let has_clusters = db::has_cluster_data(conn);
+
+    if has_clusters {
+        let clusters = match db::get_clusters_for_memory(conn) {
+            Ok(c) => c,
+            Err(_) => return None,
+        };
+
+        let years: Vec<i32> = conversations
+            .iter()
+            .filter_map(|c| c.created_at)
+            .filter_map(|ts| unix_to_year(ts).parse::<i32>().ok())
+            .collect();
+        let (earliest, latest) = years
+            .iter()
+            .fold((i32::MAX, i32::MIN), |(lo, hi), &y| (lo.min(y), hi.max(y)));
+        let year_range = if earliest == i32::MAX {
+            "Unknown".to_string()
+        } else if earliest == latest {
+            earliest.to_string()
+        } else {
+            format!("{}–{}", earliest, latest)
+        };
+
+        if generate_memory_md_clustered(&memory_dir, &clusters, conversations.len(), &year_range)
+            .is_err()
+        {
+            return None;
+        }
+        if generate_topic_files(&memory_dir, &clusters).is_err() {
+            return None;
+        }
+    } else {
+        if generate_memory_md_unclustered(&memory_dir, conversations).is_err() {
+            return None;
+        }
+    }
+
+    Some(memory_dir.to_string_lossy().to_string())
 }
 
 // ── Asset extraction ───────────────────────────────────────────────────────────

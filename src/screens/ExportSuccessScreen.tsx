@@ -7,10 +7,11 @@ interface ExportSuccessScreenProps {
   folderPath: string;
   mcpConfigured: boolean;
   mediaExtracted: number;
+  memoryPath: string | null;
   onStartOver: () => void;
 }
 
-export function ExportSuccessScreen({ count, folderPath, mcpConfigured, mediaExtracted, onStartOver }: ExportSuccessScreenProps) {
+export function ExportSuccessScreen({ count, folderPath, mcpConfigured, mediaExtracted, memoryPath, onStartOver }: ExportSuccessScreenProps) {
   const [isOpenHovered, setIsOpenHovered] = useState(false);
   const [isStartOverHovered, setIsStartOverHovered] = useState(false);
 
@@ -46,6 +47,11 @@ export function ExportSuccessScreen({ count, folderPath, mcpConfigured, mediaExt
             {mediaExtracted > 0 && (
               <p className="text-xs text-neutral-400">
                 + {mediaExtracted.toLocaleString()} images & files
+              </p>
+            )}
+            {memoryPath && (
+              <p className="text-xs text-neutral-400">
+                Claude Code memory ready
               </p>
             )}
             <p className="text-xs text-neutral-400">{displayPath}</p>

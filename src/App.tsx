@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { useAppStore } from './store/appStore';
 import { DropZone } from './components/DropZone';
 import { ProgressView } from './components/ProgressView';
@@ -11,6 +12,7 @@ interface ExportResult {
   folder_path: string;
   mcp_configured: boolean;
   media_extracted: number;
+  memory_path: string | null;
 }
 
 export default function App() {
@@ -26,13 +28,23 @@ export default function App() {
     exportCount,
     mcpConfigured,
     mediaExtracted,
+    memoryPath,
   } = useAppStore();
 
   const handleExport = async () => {
+    const chosen = await openDialog({
+      directory: true,
+      title: 'Choose export folder',
+    });
+    // User cancelled the picker
+    if (chosen === null) return;
+
     setExporting();
     try {
-      const result = await invoke<ExportResult>('export_conversations');
-      setExportSuccess(result.folder_path, result.files_written, result.mcp_configured, result.media_extracted);
+      const result = await invoke<ExportResult>('export_conversations', {
+        exportDir: chosen,
+      });
+      setExportSuccess(result.folder_path, result.files_written, result.mcp_configured, result.media_extracted, result.memory_path);
     } catch (err) {
       useAppStore.setState({ phase: 'error', error: String(err) });
     }
@@ -74,6 +86,7 @@ export default function App() {
           folderPath={exportPath}
           mcpConfigured={mcpConfigured ?? false}
           mediaExtracted={mediaExtracted ?? 0}
+          memoryPath={memoryPath}
           onStartOver={reset}
         />
       )}
