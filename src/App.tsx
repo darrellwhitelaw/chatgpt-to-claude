@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { useAppStore } from './store/appStore';
 import { DropZone } from './components/DropZone';
 import { ProgressView } from './components/ProgressView';
@@ -31,9 +32,18 @@ export default function App() {
   } = useAppStore();
 
   const handleExport = async () => {
+    const chosen = await openDialog({
+      directory: true,
+      title: 'Choose export folder',
+    });
+    // User cancelled the picker
+    if (chosen === null) return;
+
     setExporting();
     try {
-      const result = await invoke<ExportResult>('export_conversations');
+      const result = await invoke<ExportResult>('export_conversations', {
+        exportDir: chosen,
+      });
       setExportSuccess(result.folder_path, result.files_written, result.mcp_configured, result.media_extracted, result.memory_path);
     } catch (err) {
       useAppStore.setState({ phase: 'error', error: String(err) });

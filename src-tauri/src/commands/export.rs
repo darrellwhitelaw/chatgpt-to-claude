@@ -30,6 +30,7 @@ pub struct ExportResult {
 #[tauri::command]
 pub async fn export_conversations(
     state: State<'_, AppState>,
+    export_dir: Option<String>,
 ) -> Result<ExportResult, String> {
     let conversations = {
         let conn = state.db.lock().map_err(|e| e.to_string())?;
@@ -46,7 +47,10 @@ pub async fn export_conversations(
     };
 
     let home = std::env::var("HOME").map_err(|_| "Cannot determine home directory".to_string())?;
-    let root = PathBuf::from(&home).join("Documents").join("ChatGPT History");
+    let root = match export_dir {
+        Some(ref dir) => PathBuf::from(dir),
+        None => PathBuf::from(&home).join("Documents").join("ChatGPT History"),
+    };
     std::fs::create_dir_all(&root).map_err(|e| e.to_string())?;
 
     // Remove legacy Projects/ folder if present from an older export
