@@ -9,7 +9,7 @@ use crate::ai::{batch, prompts};
 
 const SERVICE: &str = "com.darrellwhitelaw.chatgpt-to-claude";
 const USER: &str = "anthropic-api-key";
-const MODEL: &str = "claude-3-5-haiku-20241022";
+const MODEL: &str = "claude-haiku-4-5-20251001";
 const CLUSTERING_SYSTEM_PROMPT: &str =
     "You are a conversation analyst. Analyze the following ChatGPT conversation \
      transcript and return a JSON object with fields: cluster_label (string), \
@@ -57,10 +57,10 @@ pub async fn estimate_cost(state: State<'_, AppState>) -> Result<CostEstimate, S
         .map(|c| c.token_estimate as u64)
         .sum();
 
-    // 3. Compute cost — haiku-3-5 batch pricing
-    // input: $0.40/MTok, output: $2.00/MTok, estimated ~300 output tokens/conversation
-    let input_cost = (input_tokens as f64 * 0.40) / 1_000_000.0;
-    let output_cost = (conversation_count as f64 * 300.0 * 2.00) / 1_000_000.0;
+    // 3. Compute cost — haiku-4-5 batch pricing (50% off standard)
+    // input: $0.50/MTok, output: $2.50/MTok, estimated ~300 output tokens/conversation
+    let input_cost = (input_tokens as f64 * 0.50) / 1_000_000.0;
+    let output_cost = (conversation_count as f64 * 300.0 * 2.50) / 1_000_000.0;
     let estimated_usd = input_cost + output_cost;
 
     Ok(CostEstimate { input_tokens, estimated_usd })
