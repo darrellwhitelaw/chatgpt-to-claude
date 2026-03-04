@@ -2,6 +2,16 @@ use crate::pipeline::normalizer::ConversationRecord;
 use rusqlite::{params, Connection, Result};
 
 pub fn init_schema(conn: &Connection) -> Result<()> {
+    // WAL mode allows concurrent reads during background writes (e.g. clustering).
+    // busy_timeout prevents "database is locked" on contention.
+    conn.execute_batch(
+        "PRAGMA journal_mode = WAL;
+         PRAGMA synchronous = NORMAL;
+         PRAGMA busy_timeout = 5000;
+         PRAGMA foreign_keys = ON;
+         PRAGMA cache_size = -2000;",
+    )?;
+
     conn.execute_batch(include_str!("schema.sql"))?;
     // Migration: add gizmo_id column for existing databases (safe to run multiple times)
     let _ = conn.execute("ALTER TABLE conversations ADD COLUMN gizmo_id TEXT", []);
