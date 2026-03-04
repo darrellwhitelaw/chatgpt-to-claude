@@ -10,6 +10,7 @@ export type AppPhase =
   | 'key-stored'           // AI path: key confirmed — ready to fetch cost
   | 'cost-ready'           // AI path: show CostScreen
   | 'clustering'           // AI path: batch polling active
+  | 'preview'              // AI path: show cluster preview before export
   | 'error';
 
 export type ExportMode = 'with-ai' | 'without-ai' | null;
@@ -18,6 +19,14 @@ export interface Summary {
   total: number;
   earliestYear: number;
   latestYear: number;
+}
+
+export interface ClusterPreviewItem {
+  label: string;
+  count: number;
+  titles: string[];
+  earliest: string | null;
+  latest: string | null;
 }
 
 interface AppState {
@@ -37,6 +46,7 @@ interface AppState {
   batchId: string | null;
   clusterError: string | null;
   elapsedSecs: number;
+  clusterPreview: ClusterPreviewItem[] | null;
 
   // Phase 1 actions
   setStage: (stage: string) => void;
@@ -55,6 +65,7 @@ interface AppState {
   setClustering: (batchId: string) => void;
   setClusteringComplete: () => void;
   setClusterError: (msg: string) => void;
+  setPreview: (items: ClusterPreviewItem[]) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -73,6 +84,7 @@ export const useAppStore = create<AppState>((set) => ({
   batchId: null,
   clusterError: null,
   elapsedSecs: 0,
+  clusterPreview: null,
 
   // Phase 1
   setStage: (stage) => set({ phase: 'parsing', stage, error: null }),
@@ -82,7 +94,7 @@ export const useAppStore = create<AppState>((set) => ({
     phase: 'idle', stage: '', error: null, summary: null,
     exportMode: null, exportPath: null, exportCount: null, mcpConfigured: null, mediaExtracted: null,
     tokenEstimate: null, costEstimateUsd: null, batchId: null,
-    clusterError: null, elapsedSecs: 0,
+    clusterError: null, elapsedSecs: 0, clusterPreview: null,
   }),
 
   // Export path
@@ -96,6 +108,7 @@ export const useAppStore = create<AppState>((set) => ({
   setCostReady: (tokenEstimate, costEstimateUsd) =>
     set({ phase: 'cost-ready', tokenEstimate, costEstimateUsd }),
   setClustering: (batchId) => set({ phase: 'clustering', batchId }),
-  setClusteringComplete: () => set({ phase: 'export-success', exportMode: 'with-ai' }),
+  setClusteringComplete: () => set({ phase: 'preview' }),
   setClusterError: (msg) => set({ phase: 'error', clusterError: msg }),
+  setPreview: (items) => set({ clusterPreview: items }),
 }));
