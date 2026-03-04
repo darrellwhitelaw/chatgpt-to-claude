@@ -68,6 +68,57 @@ pub fn get_all_conversations(conn: &Connection) -> Result<Vec<ConversationRow>> 
     rows.collect()
 }
 
+pub struct MemoryCluster {
+    pub cluster_label: String,
+    pub count: i64,
+    pub titles: Vec<String>,
+    pub summary: Option<String>,
+    pub instructions: Option<String>,
+    pub earliest: Option<i64>,
+    pub latest: Option<i64>,
+}
+
+/// Fetches cluster data grouped by cluster_label for Claude Code memory generation.
+pub fn get_clusters_for_memory(conn: &Connection) -> Result<Vec<MemoryCluster>> {
+    let mut stmt = conn.prepare(
+        "SELECT cluster_label, COUNT(*) as cnt,
+                GROUP_CONCAT(title, '|||') as titles,
+                MIN(summary) as summary,
+                MIN(instructions) as instructions,
+                MIN(created_at) as earliest,
+                MAX(created_at) as latest
+         FROM conversations
+         WHERE cluster_label IS NOT NULL AND cluster_label != ''
+         GROUP BY cluster_label
+         ORDER BY cnt DESC",
+    )?;
+    let rows = stmt.query_map([], |row| {
+        let titles_str: String = row.get(2)?;
+        let titles: Vec<String> = titles_str.split("|||").map(|s| s.to_string()).collect();
+        Ok(MemoryCluster {
+            cluster_label: row.get(0)?,
+            count: row.get(1)?,
+            titles,
+            summary: row.get(3)?,
+            instructions: row.get(4)?,
+            earliest: row.get(5)?,
+            latest: row.get(6)?,
+        })
+    })?;
+    rows.collect()
+}
+
+/// Returns true if any conversations have cluster_label set (i.e., AI analysis was run).
+pub fn has_cluster_data(conn: &Connection) -> bool {
+    conn.query_row(
+        "SELECT COUNT(*) FROM conversations WHERE cluster_label IS NOT NULL AND cluster_label != ''",
+        [],
+        |row| row.get::<_, i64>(0),
+    )
+    .map(|c| c > 0)
+    .unwrap_or(false)
+}
+
 pub struct ExportRow {
     pub id: String,
     pub title: Option<String>,

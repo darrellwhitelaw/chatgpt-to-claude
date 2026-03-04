@@ -11,6 +11,7 @@ interface ExportResult {
   folder_path: string;
   mcp_configured: boolean;
   media_extracted: number;
+  memory_path: string | null;
 }
 
 export default function App() {
@@ -26,13 +27,14 @@ export default function App() {
     exportCount,
     mcpConfigured,
     mediaExtracted,
+    memoryPath,
   } = useAppStore();
 
   const handleExport = async () => {
     setExporting();
     try {
       const result = await invoke<ExportResult>('export_conversations');
-      setExportSuccess(result.folder_path, result.files_written, result.mcp_configured, result.media_extracted);
+      setExportSuccess(result.folder_path, result.files_written, result.mcp_configured, result.media_extracted, result.memory_path);
     } catch (err) {
       useAppStore.setState({ phase: 'error', error: String(err) });
     }
@@ -74,6 +76,7 @@ export default function App() {
           folderPath={exportPath}
           mcpConfigured={mcpConfigured ?? false}
           mediaExtracted={mediaExtracted ?? 0}
+          memoryPath={memoryPath}
           onStartOver={reset}
         />
       )}
