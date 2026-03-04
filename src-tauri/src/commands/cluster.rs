@@ -24,21 +24,6 @@ pub struct CostEstimate {
     pub estimated_usd: f64,
 }
 
-#[derive(Serialize)]
-pub struct ClusterPreviewItem {
-    pub label: String,
-    pub count: i64,
-    pub titles: Vec<String>,
-    pub earliest: Option<String>,
-    pub latest: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct ClusterPreview {
-    pub clusters: Vec<ClusterPreviewItem>,
-    pub total_clustered: i64,
-}
-
 #[derive(Clone, Serialize)]
 #[serde(tag = "event", content = "data", rename_all = "camelCase")]
 pub enum ClusterEvent {
@@ -215,54 +200,4 @@ pub async fn start_clustering(
             return Err(err);
         }
     }
-}
-
-#[tauri::command]
-pub async fn get_cluster_preview(state: State<'_, AppState>) -> Result<ClusterPreview, String> {
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let clusters = db::get_clusters_for_memory(&conn).map_err(|e| e.to_string())?;
-
-    let total_clustered: i64 = clusters.iter().map(|c| c.count).sum();
-
-    let items: Vec<ClusterPreviewItem> = clusters
-        .into_iter()
-        .map(|c| ClusterPreviewItem {
-            label: c.cluster_label,
-            count: c.count,
-            titles: c.titles.into_iter().take(5).collect(),
-            earliest: c.earliest.map(unix_to_date_str),
-            latest: c.latest.map(unix_to_date_str),
-        })
-        .collect();
-
-    Ok(ClusterPreview {
-        clusters: items,
-        total_clustered,
-    })
-}
-
-fn unix_to_date_str(ts: i64) -> String {
-    let mut days = ts / 86_400;
-    let mut year = 1970i32;
-    loop {
-        let days_in_year = if is_leap(year) { 366i64 } else { 365i64 };
-        if days < days_in_year { break; }
-        days -= days_in_year;
-        year += 1;
-    }
-    let month_lengths: [i64; 12] = [
-        31, if is_leap(year) { 29 } else { 28 },
-        31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
-    ];
-    let mut month = 1u32;
-    for &m in &month_lengths {
-        if days < m { break; }
-        days -= m;
-        month += 1;
-    }
-    format!("{}-{:02}-{:02}", year, month, days + 1)
-}
-
-fn is_leap(year: i32) -> bool {
-    (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
 }

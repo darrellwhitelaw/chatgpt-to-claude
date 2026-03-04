@@ -6,7 +6,6 @@ interface SummaryCardProps {
   earliestYear: number;
   latestYear: number;
   onExport: () => void;
-  onOrganizeWithAI?: () => void;
 }
 
 export function SummaryCard({
@@ -14,7 +13,6 @@ export function SummaryCard({
   earliestYear,
   latestYear,
   onExport,
-  onOrganizeWithAI,
 }: SummaryCardProps) {
   const [isExportHovered, setIsExportHovered] = useState(false);
 
@@ -59,15 +57,6 @@ export function SummaryCard({
           >
             Export to Claude
           </button>
-
-          {onOrganizeWithAI && (
-            <button
-              onClick={onOrganizeWithAI}
-              className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors underline underline-offset-2"
-            >
-              Organize with AI
-            </button>
-          )}
         </div>
       </div>
     </div>
