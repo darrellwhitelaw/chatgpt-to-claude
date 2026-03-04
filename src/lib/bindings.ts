@@ -27,3 +27,17 @@ export type ClusterEvent =
 export type StartClusteringArgs = {
   // No args needed — cluster command reads from SQLite and Keychain internally
 };
+
+// ClusterPreview — must stay in sync with src-tauri/src/commands/cluster.rs
+export interface ClusterPreviewItem {
+  label: string;
+  count: number;
+  titles: string[];
+  earliest: string | null;
+  latest: string | null;
+}
+
+export interface ClusterPreview {
+  clusters: ClusterPreviewItem[];
+  total_clustered: number;
+}
