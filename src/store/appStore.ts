@@ -30,6 +30,7 @@ interface AppState {
   exportCount: number | null;       // files written on export-success
   mcpConfigured: boolean | null;    // whether Claude Desktop MCP was auto-configured
   mediaExtracted: number | null;    // images + group chats extracted from ZIP
+  memoryPath: string | null;        // Claude Code memory directory path
 
   // AI path fields
   tokenEstimate: number | null;
@@ -46,7 +47,7 @@ interface AppState {
 
   // Export path actions
   setExporting: () => void;
-  setExportSuccess: (path: string, count: number, mcpConfigured: boolean, mediaExtracted: number) => void;
+  setExportSuccess: (path: string, count: number, mcpConfigured: boolean, mediaExtracted: number, memoryPath: string | null) => void;
 
   // AI path actions
   setAwaitingKey: () => void;
@@ -67,6 +68,7 @@ export const useAppStore = create<AppState>((set) => ({
   exportCount: null,
   mcpConfigured: null,
   mediaExtracted: null,
+  memoryPath: null,
 
   tokenEstimate: null,
   costEstimateUsd: null,
@@ -80,15 +82,15 @@ export const useAppStore = create<AppState>((set) => ({
   setComplete: (summary) => set({ phase: 'complete', summary }),
   reset: () => set({
     phase: 'idle', stage: '', error: null, summary: null,
-    exportMode: null, exportPath: null, exportCount: null, mcpConfigured: null, mediaExtracted: null,
+    exportMode: null, exportPath: null, exportCount: null, mcpConfigured: null, mediaExtracted: null, memoryPath: null,
     tokenEstimate: null, costEstimateUsd: null, batchId: null,
     clusterError: null, elapsedSecs: 0,
   }),
 
   // Export path
   setExporting: () => set({ phase: 'exporting', exportMode: 'without-ai' }),
-  setExportSuccess: (path, count, mcpConfigured, mediaExtracted) =>
-    set({ phase: 'export-success', exportPath: path, exportCount: count, mcpConfigured, mediaExtracted }),
+  setExportSuccess: (path, count, mcpConfigured, mediaExtracted, memoryPath) =>
+    set({ phase: 'export-success', exportPath: path, exportCount: count, mcpConfigured, mediaExtracted, memoryPath }),
 
   // AI path
   setAwaitingKey: () => set({ phase: 'awaiting-key', exportMode: 'with-ai' }),
