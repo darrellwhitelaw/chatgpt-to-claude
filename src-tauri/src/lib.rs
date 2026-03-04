@@ -39,6 +39,7 @@ pub fn run() {
             commands::keychain::delete_api_key,
             commands::cluster::estimate_cost,
             commands::cluster::start_clustering,
+            commands::cluster::get_cluster_preview,
             commands::export::export_conversations,
         ])
         .run(tauri::generate_context!())
